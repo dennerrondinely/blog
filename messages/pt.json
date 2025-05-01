@@ -1,0 +1,48 @@
+{
+  "common": {
+    "welcome": "Bem-vindo ao meu blog",
+    "description": "Um blog pessoal construído com Next.js e next-intl"
+  },
+  "navigation": {
+    "home": "Início",
+    "about": "Sobre",
+    "blog": "Blog",
+    "posts": "Posts",
+    "projects": "Projetos"
+  },
+  "blog": {
+    "title": "Código, Café e Curiosidade",
+    "description": "Minhas reflexões sobre desenvolvimento web, React, TypeScript e boas práticas.",
+    "publishedOn": "Publicado em {date}",
+    "readMore": "Ler mais",
+    "noTranslation": "Esta postagem não está disponível em {language}",
+    "viewIn": "Ver em {language}",
+    "noPosts": "Nenhuma postagem encontrada."
+  },
+  "home": {
+    "title": "Denner Rondinely",
+    "description": "Engenheiro de Software apaixonado por criar aplicações web bonitas e acessíveis. Escrevo sobre React, TypeScript e boas práticas de desenvolvimento web.",
+    "quote": "A melhor maneira de prever o futuro é criá-lo.",
+    "readBlog": "Ler meu blog"
+  },
+  "languageSelector": {
+    "label": "Mudar idioma",
+    "languages": {
+      "en": "EN",
+      "pt": "PT"
+    },
+    "notAvailable": "Versão em {language} não disponível"
+  },
+  "footer": {
+    "socialLinks": {
+      "linkedin": "Visite meu perfil no LinkedIn",
+      "instagram": "Me siga no Instagram",
+      "github": "Veja meus projetos no GitHub"
+    }
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  }
+}
