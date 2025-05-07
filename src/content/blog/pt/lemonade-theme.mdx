@@ -1,0 +1,103 @@
+---
+title: 'Criando e Publicando o Tema Lemonade para VS Code'
+description: 'Como criar, publicar e automatizar um tema moderno para VS Code usando o Lemonade como exemplo.'
+date: '2024-05-01'
+tags: ['vscode', 'tema', 'automação', 'github-actions']
+locale: 'pt'
+originalTitle: 'Building and Publishing the Lemonade VS Code Theme'
+---
+
+import Image from 'next/image';
+
+# 🍋 Criando e Publicando o Tema Lemonade para VS Code
+
+Criar seu próprio tema para o Visual Studio Code é uma forma divertida de personalizar seu ambiente de desenvolvimento e compartilhar seu estilo com a comunidade. Neste artigo, mostro como criei o tema Lemonade, como você pode criar o seu, publicar no Marketplace do VS Code e automatizar o processo com GitHub Actions.
+
+## Por que Lemonade?
+
+Queria um tema escuro, moderno, vibrante e legível, inspirado no Atom Material, mas com uma paleta de cores única e destaques especiais para tags, aspas e outros elementos. Assim nasceu o Lemonade!
+
+## 1. Como criar um tema para VS Code
+
+1. **Configure seu projeto:**
+
+   - Crie uma nova pasta e inicialize com `npm init`.
+   - Adicione um `package.json` com os campos obrigatórios (`name`, `displayName`, `description`, `version`, `publisher`, `engines`, `categories`, `contributes`).
+   - Crie a pasta `themes/` e adicione seu arquivo de tema (ex: `lemonade-color-theme.json`).
+
+2. **Defina sua paleta de cores:**
+
+   - Escolha uma cor base (o Lemonade usa `#2A2D34`).
+   - Adicione cores de destaque para tags, palavras-chave, strings, etc.
+   - Mapeie os tokens de UI e sintaxe do VS Code para sua paleta.
+
+3. **Teste localmente:**
+   - Abra a pasta no VS Code.
+   - Pressione `F5` para abrir o Extension Development Host e visualizar seu tema.
+
+## 2. Como publicar seu tema
+
+1. **Crie uma publisher:**
+
+   - Acesse o [Visual Studio Marketplace](https://marketplace.visualstudio.com/manage).
+   - Crie uma publisher e gere seu Personal Access Token (PAT).
+
+2. **Instale o vsce:**
+
+   ```sh
+   npm install -g @vscode/vsce
+   ```
+
+3. **Empacote seu tema:**
+
+   ```sh
+   vsce package
+   ```
+
+   Isso gera um arquivo `.vsix`.
+
+4. **Publique:**
+   ```sh
+   vsce publish -p <SEU_PAT>
+   ```
+
+## 3. Automatizando a publicação com GitHub Actions
+
+Você pode automatizar a publicação a cada push na branch `main` com um workflow assim:
+
+```yaml
+name: Publish VS Code Extension
+on:
+  push:
+    branches: [main]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npx vsce publish -p ${{ secrets.VSCE_PAT }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+```
+
+Adicione seu VSCE_PAT como segredo no repositório do GitHub.
+
+## 4. Lições aprendidas
+
+- Sempre teste seu tema em diferentes linguagens e tipos de arquivo.
+- Use um `.vscodeignore` para manter o pacote da extensão limpo.
+- Adicione uma LICENSE e um bom README.
+
+## 5. Experimente o Lemonade!
+
+Você encontra o Lemonade no [GitHub](https://github.com/dennerrondinely/lemonade) e no [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Denner.lemonade-theme).
+
+{/* <Image src="/images/screenshot.png" alt="Screenshot do Tema Lemonade" width={800} height={400} /> */}
+
+---
+
+Bons temas!

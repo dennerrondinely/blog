@@ -44,6 +44,30 @@ const tagColors: Record<string, TagColor> = {
     background: 'bg-orange-100 dark:bg-orange-900',
     text: 'text-orange-800 dark:text-orange-100',
   },
+  vscode: {
+    background: 'bg-teal-100 dark:bg-teal-900',
+    text: 'text-teal-800 dark:text-teal-100',
+  },
+  theme: {
+    background: 'bg-cyan-100 dark:bg-cyan-900',
+    text: 'text-cyan-800 dark:text-cyan-100',
+  },
+  automation: {
+    background: 'bg-emerald-100 dark:bg-emerald-900',
+    text: 'text-emerald-800 dark:text-emerald-100',
+  },
+  'github-actions': {
+    background: 'bg-violet-100 dark:bg-violet-900',
+    text: 'text-violet-800 dark:text-violet-100',
+  },
+  tema: {
+    background: 'bg-cyan-100 dark:bg-cyan-900',
+    text: 'text-cyan-800 dark:text-cyan-100',
+  },
+  automação: {
+    background: 'bg-emerald-100 dark:bg-emerald-900',
+    text: 'text-emerald-800 dark:text-emerald-100',
+  },
 };
 
 export function getTagColors(tag: string): TagColor {
