@@ -1,0 +1,128 @@
+---
+title: How to create a professional and automated README for your GitHub profile
+description: Learn how to build an engaging and automated GitHub README that updates your blog posts and showcases your main projects.
+date: '2024-05-25'
+slug: professional-readme-automation
+locale: 'en'
+originalTitle: 'How to create a professional and automated README for your GitHub profile'
+---
+
+A professional GitHub profile README can be a powerful way to introduce yourself, highlight your key projects, and even link dynamic content like your blog posts.
+
+In this tutorial, you'll learn how to:
+
+- Build a visually engaging README using Markdown
+- Highlight your most relevant projects
+- Automatically update your blog posts in the README
+- Connect your personal blog built with **Next.js** to your GitHub profile
+
+---
+
+## 🧠 Why have a professional README?
+
+A profile README is the first thing visitors see on your GitHub. It acts like your **developer portfolio**, so it should reflect:
+
+- Who you are
+- What you're building
+- Where to find your work (projects, blog, LinkedIn, etc.)
+
+Here's what we'll build:
+
+![preview](https://i.gifer.com/77w2.gif)
+
+---
+
+## 🚀 Step 1: Create the `README.md`
+
+In a repository named exactly as your GitHub username (e.g. `dennerrondinely`), create a `README.md` and structure it with:
+
+```md
+# 👋 Hello, I'm Denner
+
+![GIF](https://i.gifer.com/77w2.gif)
+
+## 🚧 Projects I'm focusing on
+
+- [TailAid](https://github.com/dennerrondinely/tail-aid)
+- [Tailor](https://github.com/dennerrondinely/tailor)
+- [Lemonade](https://github.com/dennerrondinely/lemonade)
+
+## 📝 Latest blog posts
+
+<!-- BLOG-POSTS:START -->
+<!-- BLOG-POSTS:END -->
+
+## 📫 Connect with me
+
+- Email: denner.rondinely@gmail.com
+- [LinkedIn](https://www.linkedin.com/in/denner-rondinely-da-silva/)
+- [Blog](https://www.dennerrondinely.dev/en)
+```
+
+---
+
+## ⚙️ Step 2: Expose your blog posts with an API
+
+If you use `Markdown` files locally in a `Next.js` blog, expose your posts through a route like:
+
+```
+/pages/api/posts.ts
+```
+
+This should return the latest 5 posts in JSON.
+
+---
+
+## 🧪 Step 3: Write the update script
+
+Create a file like `scripts/update-blog-posts.ts`:
+
+```ts
+// fetches latest blog posts and updates the README
+```
+
+[Full code on GitHub](https://github.com/dennerrondinely/dennerrondinely/blob/main/scripts/update-blog-posts.ts)
+
+---
+
+## 🤖 Step 4: Automate with GitHub Actions
+
+Create the file:
+
+```
+.github/workflows/update-blog-posts.yml
+```
+
+With the following:
+
+```yaml
+name: Update blog posts in README
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+jobs:
+  update-readme: ...
+```
+
+---
+
+## 🧩 Bonus: Add your favorite technology badges
+
+Use [shields.io](https://shields.io/) to generate badges like:
+
+```md
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+```
+
+---
+
+## ✅ Result
+
+You'll have a GitHub profile that:
+
+- Shows what you're working on
+- Updates automatically
+- Promotes your personal blog
+
+[See live example →](https://github.com/dennerrondinely)

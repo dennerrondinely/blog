@@ -5,6 +5,11 @@ import { NextResponse } from 'next/server';
 
 const postsDirectory = path.join(process.cwd(), 'src', 'content', 'blog', 'en');
 
+function isValidDate(dateString: string): boolean {
+  const date = new Date(dateString);
+  return date instanceof Date && !isNaN(date.getTime());
+}
+
 export async function GET() {
   try {
     const filenames = fs.readdirSync(postsDirectory);
@@ -15,11 +20,15 @@ export async function GET() {
       const { data } = matter(fileContents);
 
       const slug = data.slug || filename.replace(/\.mdx?$/, '');
+      const date = data.date || data.publishedAt;
+
+      // Validate date and use current date as fallback if invalid
+      const validDate = isValidDate(date) ? date : new Date().toISOString().split('T')[0];
 
       return {
         title: data.title || slug,
         slug,
-        date: data.date || '1970-01-01',
+        date: validDate,
         url: `/en/blog/${slug}`,
       };
     });

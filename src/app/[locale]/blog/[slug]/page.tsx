@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { PostLanguageSelector } from '@/components/language/PostLanguageSelector';
 import { Tag } from '@/components/blog/Tag';
+import { formatDate } from '@/utils/date';
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -34,7 +35,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         )}
         {frontmatter.date && (
           <p className="text-text-secondary text-sm mb-8">
-            {t('publishedOn', { date: new Date(frontmatter.date).toLocaleDateString(locale) })}
+            {t('publishedOn', {
+              date: formatDate(frontmatter.date, locale as 'en' | 'pt'),
+            })}
           </p>
         )}
         <div className="flex flex-wrap gap-2 mb-8">
