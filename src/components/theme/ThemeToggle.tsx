@@ -35,9 +35,9 @@ export function ThemeToggle({ 'data-testid': dataTestId }: ThemeToggleProps) {
     >
       <span className="sr-only">Toggle theme</span>
       {theme === 'dark' ? (
-        <SunIcon className="h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        <SunIcon className="h-5 w-5 transition-all dark:rotate-0 dark:scale-100" />
       ) : (
-        <MoonIcon className="h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        <MoonIcon className="h-5 w-5 transition-all dark:rotate-0 dark:scale-100" />
       )}
     </button>
   );
