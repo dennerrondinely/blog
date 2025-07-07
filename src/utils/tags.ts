@@ -68,6 +68,30 @@ const tagColors: Record<string, TagColor> = {
     background: 'bg-emerald-100 dark:bg-emerald-900',
     text: 'text-emerald-800 dark:text-emerald-100',
   },
+  'engenharia-de-software': {
+    background: 'bg-purple-100 dark:bg-purple-900',
+    text: 'text-purple-800 dark:text-purple-100',
+  },
+  'software-engineering': {
+    background: 'bg-purple-100 dark:bg-purple-900',
+    text: 'text-purple-800 dark:text-purple-100',
+  },
+  'boas-práticas': {
+    background: 'bg-pink-100 dark:bg-pink-900',
+    text: 'text-pink-800 dark:text-pink-100',
+  },
+  'best-practices': {
+    background: 'bg-pink-100 dark:bg-pink-900',
+    text: 'text-pink-800 dark:text-pink-100',
+  },
+  'code-review': {
+    background: 'bg-green-100 dark:bg-green-900',
+    text: 'text-green-800 dark:text-green-100',
+  },
+  dev: {
+    background: 'bg-blue-100 dark:bg-blue-900',
+    text: 'text-blue-800 dark:text-blue-100',
+  },
 };
 
 export function getTagColors(tag: string): TagColor {
