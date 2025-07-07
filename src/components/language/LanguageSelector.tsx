@@ -28,7 +28,7 @@ export function LanguageSelector({ 'data-testid': dataTestId }: LanguageSelector
         <DropdownMenu.Content
           align="end"
           sideOffset={8}
-          className="z-50 p-1 min-w-[120px] overflow-hidden text-foreground rounded-md border-border shadow-md animate-in border data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+          className="z-50 p-1 min-w-[120px] overflow-hidden text-foreground bg-white rounded-md border-border shadow-md animate-in border dark:bg-zinc-900 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
         >
           <DropdownMenu.Item
             data-testid="language-option-en"
