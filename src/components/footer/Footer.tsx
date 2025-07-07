@@ -17,7 +17,7 @@ const socialLinks: SocialLink[] = [
   },
   {
     icon: GitHubLogoIcon,
-    href: 'https://github.com/dennercodes',
+    href: 'https://github.com/dennerrondinely',
     label: 'GitHub',
   },
 ];

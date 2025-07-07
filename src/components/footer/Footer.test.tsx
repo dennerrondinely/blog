@@ -16,7 +16,7 @@ describe('Footer', () => {
     );
     expect(screen.getByLabelText('GitHub')).toHaveAttribute(
       'href',
-      'https://github.com/dennercodes'
+      'https://github.com/dennerrondinely'
     );
   });
 
