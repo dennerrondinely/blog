@@ -147,21 +147,31 @@ class Redirect {
 
 O template tenta abrir o app e, se não funcionar em 2 segundos, redireciona para a loja:
 
-```handlebars
-{{! redirect.handlebars }}
+```HTML
 <h1>Abrindo {{name}}...</h1>
-<div class='spinner'></div>
-<p id='message'>Tentando abrir o aplicativo...</p>
+<div class="spinner"></div>
+<p id="message">Tentando abrir o aplicativo...</p>
 
 <script>
-  const appUrl = '{{{appUrl}}}'; const storeUrl = '{{{store}}}'; const timeout = 2000; const start =
-  Date.now(); // Tenta abrir o app window.location = appUrl; // Fallback para loja após timeout
-  const fallbackTimer = setTimeout(function() { if (Date.now() - start < timeout + 100) {
-  document.getElementById('message').textContent = 'Redirecionando para a loja...'; window.location
-  = storeUrl; } }, timeout); // Cancela timeout se o app abrir
-  document.addEventListener('visibilitychange', function() { if (document.hidden) {
-  clearTimeout(fallbackTimer); } }); window.addEventListener('blur', function() {
-  clearTimeout(fallbackTimer); });
+  const appUrl = '{{{appUrl}}}';
+  const timeout = 2000;
+  const start = Date.now();
+
+  window.location = appUrl;
+
+  const fallbackTimer = setTimeout(function() {
+    if (Date.now() - start < timeout + 100) {
+      document.getElementById('message').textContent = 'Redirecionando para a loja...';
+      window.location = '{{{store}}}';
+    }
+  }, timeout);
+
+  document.addEventListener('visibilitychange', function() {
+    if(document.hidden) {
+      clearTimeout(fallbackTimer);
+    } });
+
+  window.addEventListener('blur', function() { clearTimeout(fallbackTimer); });
 </script>
 ```
 
