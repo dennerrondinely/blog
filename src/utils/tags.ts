@@ -92,6 +92,42 @@ const tagColors: Record<string, TagColor> = {
     background: 'bg-blue-100 dark:bg-blue-900',
     text: 'text-blue-800 dark:text-blue-100',
   },
+  agile: {
+    background: 'bg-lime-100 dark:bg-lime-900',
+    text: 'text-lime-800 dark:text-lime-100',
+  },
+  scrum: {
+    background: 'bg-amber-100 dark:bg-amber-900',
+    text: 'text-amber-800 dark:text-amber-100',
+  },
+  dor: {
+    background: 'bg-sky-100 dark:bg-sky-900',
+    text: 'text-sky-800 dark:text-sky-100',
+  },
+  dod: {
+    background: 'bg-rose-100 dark:bg-rose-900',
+    text: 'text-rose-800 dark:text-rose-100',
+  },
+  'software-development': {
+    background: 'bg-slate-100 dark:bg-slate-900',
+    text: 'text-slate-800 dark:text-slate-100',
+  },
+  nodejs: {
+    background: 'bg-green-100 dark:bg-green-900',
+    text: 'text-green-800 dark:text-green-100',
+  },
+  'deep-links': {
+    background: 'bg-fuchsia-100 dark:bg-fuchsia-900',
+    text: 'text-fuchsia-800 dark:text-fuchsia-100',
+  },
+  mobile: {
+    background: 'bg-indigo-100 dark:bg-indigo-900',
+    text: 'text-indigo-800 dark:text-indigo-100',
+  },
+  express: {
+    background: 'bg-zinc-100 dark:bg-zinc-900',
+    text: 'text-zinc-800 dark:text-zinc-100',
+  },
 };
 
 export function getTagColors(tag: string): TagColor {
