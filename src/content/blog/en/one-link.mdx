@@ -1,0 +1,314 @@
+---
+title: 'Building a Smart Deep Link Server with Node.js and TypeScript'
+description: 'Learn how to create an intelligent redirect system that detects devices and opens apps automatically, with fallback to app stores.'
+date: '2026-01-19'
+tags: ['nodejs', 'typescript', 'deep-links', 'mobile', 'express']
+locale: 'en'
+---
+
+# 🔗 Building a Smart Deep Link Server with Node.js and TypeScript
+
+Have you ever wondered how those links work that, when you click on your phone, automatically open the app instead of the browser? And if the app isn't installed, redirect to the store?
+
+That's the power of **deep links**, and in this article I'll show you how I built a complete server to manage this professionally.
+
+---
+
+## 🎯 The Problem
+
+Imagine you have a mobile app and want to share links that:
+
+- **On mobile**: Try to open the installed app
+- **If the app doesn't exist**: Redirect to App Store or Play Store
+- **On desktop**: Go straight to the web version
+
+Sounds simple, but there are several challenges:
+
+- How to detect if it's mobile or desktop?
+- How to know if the app is installed?
+- How to make the automatic fallback?
+- How to work without depending on JavaScript?
+
+---
+
+## 🏗️ The Solution: OneLink Server
+
+I created a Node.js server with TypeScript that solves all of this elegantly.
+
+### Tech Stack
+
+- **Node.js + Express** - Fast and minimalist server
+- **TypeScript** - Type safety and better DX
+- **Handlebars** - Server-side templates
+- **express-useragent** - Device detection
+
+### Why Node.js and not React?
+
+This was an important decision. A Node.js server is superior for deep links because:
+
+✅ **Instant redirect** - No need to wait for JavaScript to load  
+✅ **Works without JavaScript** - Bots and link previews work  
+✅ **SEO friendly** - Metadata is rendered on the server  
+✅ **Universal Links** - Can serve required `.well-known` files  
+✅ **Reliable analytics** - Real user-agent, can't be blocked
+
+React SPA would be overkill and slower for this specific use case.
+
+---
+
+## 🔧 Step-by-Step Implementation
+
+### 1. Project Structure
+
+```
+onelink-server/
+├── src/
+│   ├── controllers/
+│   │   ├── home.ts         # Home page
+│   │   └── redirect.ts     # Redirect logic
+│   ├── types/
+│   │   ├── index.ts        # Interfaces
+│   │   └── express.d.ts    # Type extensions
+│   ├── views/              # Handlebars templates
+│   ├── constants.ts        # Link configuration
+│   ├── routes.ts           # Routes
+│   └── index.ts            # Entry point
+├── tsconfig.json
+└── package.json
+```
+
+### 2. Link Configuration
+
+First, I defined the link structure with TypeScript:
+
+```typescript
+// src/types/index.ts
+export interface Link {
+  appUrl: string; // Deep link scheme (e.g.: instagram://)
+  webUrl: string; // Web fallback URL
+  name: string; // App name
+  appStore: string; // App Store link
+  playStore: string; // Play Store link
+}
+```
+
+```typescript
+// src/constants.ts
+const links: Links = {
+  'instagram-demo': {
+    appUrl: 'instagram://user?username=example',
+    webUrl: 'https://instagram.com/example',
+    name: 'Instagram Demo',
+    appStore: 'https://apps.apple.com/app/instagram/id389801252',
+    playStore: 'https://play.google.com/store/apps/details?id=com.instagram.android',
+  },
+};
+```
+
+### 3. Device Detection
+
+The controller automatically detects the device type:
+
+```typescript
+// src/controllers/redirect.ts
+class Redirect {
+  static renderRedirectPage(req: Request, res: Response): void {
+    const linkId = req.params.id as string;
+    const link = links[linkId];
+
+    if (!link) {
+      return res.status(404).render('404', { linkId });
+    }
+
+    // Log for analytics
+    console.log(
+      `[${new Date().toISOString()}] ${linkId} - ${
+        req.useragent?.isMobile ? 'Mobile' : 'Desktop'
+      } - ${req.useragent?.platform}`
+    );
+
+    // Mobile: tries to open app with fallback
+    if (req.useragent?.isMobile) {
+      return res.render('redirect', {
+        appUrl: link.appUrl,
+        store: req.useragent?.isiOS ? link.appStore : link.playStore,
+        title: `Redirecting to ${link.name}...`,
+      });
+    }
+
+    // Desktop: goes straight to web
+    res.redirect(link.webUrl);
+  }
+}
+```
+
+### 4. Template with Smart Fallback
+
+The template tries to open the app and, if it doesn't work in 2 seconds, redirects to the store:
+
+```handlebars
+{{! redirect.handlebars }}
+<h1>Opening {{name}}...</h1>
+<div class='spinner'></div>
+<p id='message'>Trying to open the app...</p>
+
+<script>
+  const appUrl = '{{{appUrl}}}'; const storeUrl = '{{{store}}}'; const timeout = 2000; const start =
+  Date.now(); // Try to open the app window.location = appUrl; // Fallback to store after timeout
+  const fallbackTimer = setTimeout(function() { if (Date.now() - start < timeout + 100) {
+  document.getElementById('message').textContent = 'Redirecting to store...'; window.location =
+  storeUrl; } }, timeout); // Cancel timeout if app opens
+  document.addEventListener('visibilitychange', function() { if (document.hidden) {
+  clearTimeout(fallbackTimer); } }); window.addEventListener('blur', function() {
+  clearTimeout(fallbackTimer); });
+</script>
+```
+
+### 5. Type Safety with TypeScript
+
+To integrate express-useragent with TypeScript, I created a type declaration:
+
+```typescript
+// src/types/express.d.ts
+import { Details } from 'express-useragent';
+
+declare global {
+  namespace Express {
+    interface Request {
+      useragent?: Details;
+    }
+  }
+}
+```
+
+---
+
+## 🚀 How It Works in Practice
+
+### iOS Mobile Flow:
+
+1. User clicks on `https://your-domain.com/instagram-demo`
+2. Server detects iOS mobile
+3. Returns HTML that tries `instagram://user?username=example`
+4. If app doesn't open in 2s → Redirects to App Store
+5. If app opens → Page is abandoned (success!)
+
+### Android Mobile Flow:
+
+Similar to iOS, but uses Intent URLs and redirects to Play Store
+
+### Desktop Flow:
+
+1. User clicks the link
+2. Server detects desktop
+3. Instant 302 redirect to web version
+4. No JavaScript, no delay
+
+---
+
+## ⚡ Important Optimizations
+
+### 1. Use Triple Braces in Handlebars
+
+```handlebars
+{{! WRONG - escapes & to &#x3D; }}
+window.location = '{{store}}';
+
+{{! RIGHT - keeps URL intact }}
+window.location = '{{{store}}}';
+```
+
+### 2. TypeScript to Prevent Errors
+
+TypeScript prevented several bugs during development:
+
+- Typed route parameters
+- Link interfaces ensure consistency
+- Editor autocomplete
+
+### 3. Hot Reload with tsx
+
+```json
+{
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  }
+}
+```
+
+---
+
+## 🎯 Results
+
+The server ended up being:
+
+- ⚡ **Fast**: Redirect in `<50ms` on the server
+- 🎨 **Simple**: ~200 lines of code
+- 🔒 **Type-safe**: Zero runtime errors related to types
+- 📱 **Functional**: Works on any device/browser
+- 🚀 **Scalable**: Ready to add DB and analytics
+
+---
+
+## 📈 Next Steps
+
+The project can evolve to:
+
+1. **Database** - Dynamic links without deploy
+2. **Analytics** - Track clicks, conversions, geolocation
+3. **A/B Testing** - Test different fallback strategies
+4. **Universal Links** - Open app without going through browser
+5. **Admin Dashboard** - React/Next.js UI to manage links
+
+---
+
+## 💡 Lessons Learned
+
+### 1. React isn't always the answer
+
+For cases like deep links, a traditional server is more efficient than an SPA.
+
+### 2. TypeScript is worth it
+
+Even in small projects, TypeScript prevents bugs and improves DX.
+
+### 3. Server-side is still relevant
+
+SSR/templates have advantages that SPAs can't easily replicate.
+
+### 4. Simplicity is power
+
+~200 lines solve a complex problem elegantly.
+
+---
+
+## 🔗 Resources
+
+- [GitHub Repository](https://github.com/dennerrondinely/one-link)
+- [Express Documentation](https://expressjs.com/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Universal Links (Apple)](https://developer.apple.com/ios/universal-links/)
+- [App Links (Android)](https://developer.android.com/training/app-links)
+
+---
+
+## 📝 Conclusion
+
+Creating a smart deep link server is simpler than it seems when you use the right tools.
+
+The combination of **Node.js + Express + TypeScript** proved to be perfect for this use case:
+
+- Quick to implement
+- Easy to maintain
+- Performant
+- Type-safe
+
+If you need to manage deep links or create a smooth mobile experience, this architecture is an excellent starting point.
+
+**Have you ever needed to implement something similar? Share your experience in the comments!** 👇
+
+---
+
+_Full code available on [GitHub](https://github.com/dennerrondinely/one-link)_ 🚀
