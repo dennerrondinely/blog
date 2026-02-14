@@ -140,6 +140,14 @@ const tagColors: Record<string, TagColor> = {
     background: 'bg-purple-100 dark:bg-purple-900',
     text: 'text-purple-800 dark:text-purple-100',
   },
+  lighthouse: {
+    background: 'bg-red-100 dark:bg-red-900',
+    text: 'text-red-800 dark:text-red-100',
+  },
+  monitoring: {
+    background: 'bg-cyan-100 dark:bg-cyan-900',
+    text: 'text-cyan-800 dark:text-cyan-100',
+  },
 };
 
 export function getTagColors(tag: string): TagColor {

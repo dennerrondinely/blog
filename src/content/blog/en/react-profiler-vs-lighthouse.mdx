@@ -1,0 +1,406 @@
+---
+title: 'React Profiler vs Lighthouse: Performance Tools Every Developer Needs to Know'
+description: 'Learn the difference between React Profiler (internal component analysis) and Lighthouse (complete web audit). When to use each and how to optimize your app.'
+date: '2026-02-14'
+tags: ['react', 'performance', 'tools', 'debugging', 'lighthouse']
+locale: 'en'
+---
+
+# 🔍 React Profiler vs Lighthouse: Performance Tools Every Developer Needs to Know
+
+Performance is critical for any web application. But when you notice your app is slow, which tool do you use to find the problem?
+
+In this article we'll compare two of the most powerful performance diagnosis tools: **React Profiler** and **Lighthouse**. We'll understand when to use each one and how to work with them together.
+
+---
+
+## 🧪 React Profiler: Internal Component Analysis
+
+The React Profiler is a **built-in React tool** that measures your component performance in real time.
+
+### What it does
+
+The React Profiler tracks:
+
+- ⏱️ **Render time** - How long each component takes to render
+- 🔄 **Re-renders** - How many times each component was rendered
+- 📦 **Component size** - Relative size in the component tree
+- 🎯 **Commits** - Each DOM update and when it occurred
+- 🔗 **Component relationships** - How re-renders cascade
+
+### How to Use
+
+The React Profiler is available in **React Developer Tools** (Chrome extension):
+
+1. Install [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
+2. Open the **Profiler** tab
+3. Click **Record** (red circle button)
+4. Interact with your app (click buttons, change state, etc.)
+5. Click **Record** again to stop
+6. Analyze the collected data
+
+### Real Example: Identifying Unnecessary Renders
+
+```typescript
+// ❌ Component that re-renders unnecessarily
+function UserList({ users, onSelect }) {
+  console.log('UserList rendered');
+
+  return (
+    <div>
+      {users.map(user => (
+        <UserCard
+          key={user.id}
+          user={user}
+          onSelect={onSelect}
+        />
+      ))}
+    </div>
+  );
+}
+
+function UserCard({ user, onSelect }) {
+  console.log(`UserCard rendered: ${user.id}`);
+
+  return (
+    <div onClick={() => onSelect(user.id)}>
+      {user.name}
+    </div>
+  );
+}
+```
+
+With the React Profiler you'll see:
+
+1. **UserList renders every time** state changes
+2. **All UserCard components render** even if the specific user didn't change
+3. **Total time** increases exponentially with the number of users
+
+### Solution with memo()
+
+```typescript
+// ✅ Optimized with React.memo
+const UserCard = React.memo(function UserCard({ user, onSelect }) {
+  console.log(`UserCard rendered: ${user.id}`);
+
+  return (
+    <div onClick={() => onSelect(user.id)}>
+      {user.name}
+    </div>
+  );
+});
+
+function UserList({ users, onSelect }) {
+  // memoize callback to prevent UserCard re-renders
+  const handleSelect = useCallback((userId) => {
+    onSelect(userId);
+  }, [onSelect]);
+
+  return (
+    <div>
+      {users.map(user => (
+        <UserCard
+          key={user.id}
+          user={user}
+          onSelect={handleSelect}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+Now with the React Profiler you'll see:
+
+1. ✅ **UserList renders normally**
+2. ✅ **Only UserCard that changed renders**
+3. ✅ **Total time drastically reduced**
+
+---
+
+## 🏛️ Lighthouse: Complete Web Audit
+
+Lighthouse is a tool from **Google Chrome** that does a complete audit of your web application.
+
+### What it does
+
+Lighthouse measures:
+
+- ⚡ **Performance** - Overall page speed
+- ♿ **Accessibility** - Accessibility for users with disabilities
+- 📱 **Best Practices** - Compliance with recommended practices
+- 🔒 **Security** - Security vulnerabilities
+- 📊 **SEO** - Search engine optimization
+
+### How to Use
+
+1. Open Chrome DevTools (F12 or Cmd+Option+I)
+2. Go to the **Lighthouse** tab
+3. Select what you want to audit (can be Mobile or Desktop)
+4. Click **Analyze page load**
+5. Wait for the complete report
+
+### Key Metrics
+
+#### Core Web Vitals
+
+Lighthouse focuses on three critical metrics:
+
+- **LCP** (Largest Contentful Paint)
+  - When the largest visible element appears
+  - Target: `< 2.5s`
+
+- **FID** (First Input Delay)
+  - How long the page takes to respond to user input
+  - Target: `< 100ms`
+
+- **CLS** (Cumulative Layout Shift)
+  - How much the layout moves while the page loads
+  - Target: `< 0.1`
+
+### Sample Report
+
+A typical Lighthouse report shows:
+
+```
+Performance: 85/100
+  ✓ Largest Contentful Paint: 1.8s
+  ✓ First Input Delay: 45ms
+  ✓ Cumulative Layout Shift: 0.05
+  ✗ Unused JavaScript: 245kb
+  ✗ Unused CSS: 89kb
+  ⚠ Images not sized correctly: 3 warnings
+```
+
+---
+
+## 🎯 Comparison: React Profiler vs Lighthouse
+
+| Aspect | React Profiler | Lighthouse |
+|--------|--------|-----------|
+| **Focus** | React components | Entire page |
+| **Cause** | Why does it render? | How to optimize? |
+| **Metric** | Render time | Core Web Vitals |
+| **Access** | Inside app (DevTools) | During audit time |
+| **Granularity** | Individual component | Complete page |
+| **Use Cases** | Unnecessary renders | Overall performance |
+| **Interactivity** | Analyzes interactions | Simulates loading |
+| **Report** | Visual in real-time | Detailed scorecard |
+
+---
+
+## 🔄 Practical Workflow: Optimizing with Both
+
+### STEP 1: Start with Lighthouse
+
+Do a general audit:
+
+```bash
+# Via CLI (more consistent)
+npm install -g @lhci/cli@latest lighthouse
+lighthouse https://your-site.com --view
+```
+
+**Look for:**
+- Low performance score
+- Bad Core Web Vitals
+- Unused files
+- Large images
+
+### STEP 2: Use React Profiler to Investigate
+
+If Lighthouse pointed out "Unused JavaScript" or "Slow rendering":
+
+1. Open React Profiler
+2. Record a common interaction (scroll, button click)
+3. Look for:
+   - Renders that take too long
+   - Re-renders in cascade
+   - Components that render for no reason
+
+### STEP 3: Implement Optimizations
+
+Based on what you found:
+
+```typescript
+// ❌ Problem: Function defined on each render
+function ProductCard({ product, onAddCart }) {
+  const handleClick = () => {
+    onAddCart(product.id);
+  };
+
+  return (
+    <button onClick={handleClick}>
+      Add to cart
+    </button>
+  );
+}
+
+// ✅ Solution: Memoize the function
+function ProductCard({ product, onAddCart }) {
+  const handleClick = useCallback(() => {
+    onAddCart(product.id);
+  }, [product.id, onAddCart]);
+
+  return (
+    <button onClick={handleClick}>
+      Add to cart
+    </button>
+  );
+}
+
+// ✅ Solution 2: Memoize the entire component
+export const MemoizedProductCard = React.memo(ProductCard);
+```
+
+### STEP 4: Validate with Lighthouse Again
+
+Run Lighthouse again to confirm improvements:
+
+```bash
+lighthouse https://your-site.com --view
+```
+
+**You should see:**
+- Performance score increase
+- Core Web Vitals improve
+- "Unused JavaScript" decrease
+
+---
+
+## 📊 Practical React Profiler Metrics
+
+### Understanding the Graph
+
+When you record an interaction, the Profiler shows:
+
+```
+Commit 1: 234ms
+  ├─ UserList: 45ms (rendered)
+  ├─ UserCard: 12ms (rendered)
+  ├─ UserCard: 11ms (rendered)
+  └─ UserCard: 10ms (rendered)
+
+Commit 2: 89ms
+  ├─ UserList: 0ms (not rendered)
+  ├─ UserCard: 2ms (rendered - changed!)
+  ├─ UserCard: 0ms (not rendered)
+  └─ UserCard: 0ms (not rendered)
+```
+
+**Colors in Profiler:**
+- 🟩 **Light green** - Fast render (`< 5ms`)
+- 🟨 **Yellow** - Medium render (`5-20ms`)
+- 🟥 **Red** - Slow render (`> 20ms`)
+
+---
+
+## 🚀 Optimization Checklist
+
+After finding issues with these tools:
+
+### React Profiler (Internal Optimizations)
+
+- [ ] Use `React.memo()` for components receiving many props
+- [ ] Use `useCallback()` for functions passed as props
+- [ ] Use `useMemo()` for expensive object/array calculations
+- [ ] Consider state colocation (move state near where it's used)
+- [ ] Split large components into smaller ones
+
+### Lighthouse (General Optimizations)
+
+- [ ] Minimize unused JavaScript
+- [ ] Optimize images (use WebP, lazy load)
+- [ ] Implement code splitting
+- [ ] Use CDN for static assets
+- [ ] Implement service workers for caching
+- [ ] Improve Core Web Vitals
+
+---
+
+## 💡 Real Cases
+
+### Case 1: Slow E-commerce
+
+**Discovered with Lighthouse:**
+- Performance score: 42/100
+- Slow LCP (4.2s)
+
+**Investigated with React Profiler:**
+- ProductCard renders 500 times with same data
+- useCallback missing in filter
+
+**Solution:**
+```typescript
+// Add useCallback to filter
+const handleFilter = useCallback((category) => {
+  setFilteredProducts(
+    products.filter(p => p.category === category)
+  );
+}, [products]);
+```
+
+**Result:** Performance score: 87/100, LCP: 1.8s
+
+---
+
+### Case 2: Dashboard with Many Charts
+
+**Discovered with Lighthouse:**
+- Performance score: 55/100
+- Unused JavaScript: 620kb
+
+**Investigated with React Profiler:**
+- Each chart renders even when data didn't change
+- All chart libraries loaded even with only 2 in use
+
+**Solution:**
+```typescript
+// Code splitting chart libraries
+const LineChart = lazy(() => import('./charts/LineChart'));
+const BarChart = lazy(() => import('./charts/BarChart'));
+
+// Memoize charts
+const MemoChart = React.memo(Chart);
+```
+
+**Result:** Performance score: 91/100, Unused JS: 120kb
+
+---
+
+## 🎓 Conclusion
+
+**Use React Profiler when:**
+- ✅ You want to understand **why** the component renders
+- ✅ Investigate cascading re-renders
+- ✅ Optimize unnecessary re-renders
+- ✅ Debug React-specific issues
+
+**Use Lighthouse when:**
+- ✅ Do a general performance audit
+- ✅ Measure Core Web Vitals
+- ✅ Check accessibility and SEO
+- ✅ Validate implemented improvements
+
+**The ideal approach:**
+
+1. Start with **Lighthouse** to identify the general problem
+2. Use **React Profiler** to investigate specific causes
+3. Implement optimizations
+4. Validate with **Lighthouse** again
+
+Together, these tools form a powerful duo for mastering your React application's performance.
+
+---
+
+## 🔗 Resources
+
+- [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools)
+- [Lighthouse Documentation](https://developers.google.com/web/tools/lighthouse)
+- [Core Web Vitals Guide](https://web.dev/vitals/)
+- [React Profiler API](https://react.dev/reference/react/Profiler)
+- [Web.dev Performance Course](https://web.dev/performance/)
+
+---
+
+_Which tool do you use the most? React Profiler or Lighthouse? Leave a comment!_ 👇

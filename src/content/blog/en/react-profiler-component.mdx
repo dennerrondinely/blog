@@ -1,0 +1,491 @@
+---
+title: 'React Profiler Component: Measuring Performance Programmatically'
+description: 'Learn how to use the React Profiler component to measure rendering performance automatically. Integrate performance monitoring directly into your code.'
+date: '2026-02-14'
+tags: ['react', 'performance', 'monitoring', 'hooks', 'debugging']
+locale: 'en'
+---
+
+# 📊 React Profiler Component: Measuring Performance Programmatically
+
+If you read our previous article on React Profiler vs Lighthouse, you know about the **visual profiling tool**. But what if you wanted to measure performance **automatically** in your code?
+
+This is where the React Profiler component comes in. This is a built-in component that allows you to measure rendering performance **programmatically**, without needing to open DevTools.
+
+---
+
+## 🎯 What is the Profiler Component?
+
+The Profiler is a React component that wraps a component tree and tracks:
+
+- ⏱️ **Actual render time** (actualDuration)
+- 📏 **Estimated time without optimizations** (baseDuration)
+- 📱 **Render phase** (mount vs update)
+- 🔢 **Start and end timestamps**
+
+### Basic Syntax
+
+```typescript
+<Profiler id="my-components" onRender={onRenderCallback}>
+  <MyComponent />
+</Profiler>
+```
+
+That's it! The `<Profiler>` will automatically start tracking the performance of `MyComponent` and its children.
+
+---
+
+## 📝 Profiler Props
+
+### `id` (string, required)
+
+A unique identifier for this profiler:
+
+```typescript
+<Profiler id="Sidebar" onRender={onRender}>
+  <Sidebar />
+</Profiler>
+
+<Profiler id="Content" onRender={onRender}>
+  <Content />
+</Profiler>
+```
+
+The `id` is passed to the callback, allowing you to identify which part was rendered.
+
+### `onRender` (function, required)
+
+The function called every time a component within the Profiler renders:
+
+```typescript
+function onRender(id, phase, actualDuration, baseDuration, startTime, commitTime) {
+  console.log(`${id} (${phase}) took ${actualDuration}ms`);
+}
+
+<Profiler id="App" onRender={onRender}>
+  <App />
+</Profiler>
+```
+
+---
+
+## 🔍 Understanding Callback Parameters
+
+The `onRender` callback receives 6 important parameters:
+
+### 1. `id` (string)
+
+The identifier of the Profiler that was triggered:
+
+```typescript
+function onRender(id) {
+  console.log(`Profiler "${id}" was rendered`);
+}
+```
+
+### 2. `phase` (string)
+
+Can be:
+- `"mount"` - Component is being mounted for the first time
+- `"update"` - Component is being updated
+- `"nested-update"` - A child component was updated
+
+```typescript
+function onRender(id, phase) {
+  if (phase === "mount") {
+    console.log("First render!");
+  } else if (phase === "update") {
+    console.log("Component re-rendered");
+  }
+}
+```
+
+### 3. `actualDuration` (number in ms)
+
+**Actual time** it took to render this component and its children:
+
+```typescript
+function onRender(id, phase, actualDuration) {
+  console.log(`Actual render time: ${actualDuration}ms`);
+  
+  if (actualDuration > 1000) {
+    console.warn("⚠️ Slow render detected!");
+  }
+}
+```
+
+### 4. `baseDuration` (number in ms)
+
+**Estimated time** if the component had **no optimizations** (memo, useMemo, useCallback):
+
+```typescript
+function onRender(id, phase, actualDuration, baseDuration) {
+  const optimizationGain = baseDuration - actualDuration;
+  console.log(`Time saved with optimizations: ${optimizationGain}ms`);
+  
+  // If the difference is small, maybe you need more optimizations
+  if (optimizationGain < 10) {
+    console.warn("Few optimizations found");
+  }
+}
+```
+
+### 5. `startTime` (number in ms)
+
+Timestamp for when React started rendering:
+
+```typescript
+function onRender(id, phase, actualDuration, baseDuration, startTime) {
+  console.log(`Render started at: ${startTime}ms`);
+}
+```
+
+### 6. `commitTime` (number in ms)
+
+Timestamp for when the DOM was updated:
+
+```typescript
+function onRender(id, phase, actualDuration, baseDuration, startTime, commitTime) {
+  const totalTime = commitTime - startTime;
+  console.log(`Total time (render + commit): ${totalTime}ms`);
+}
+```
+
+---
+
+## 💡 Practical Examples
+
+### Example 1: Detect Slow Renders
+
+```typescript
+import { Profiler } from 'react';
+
+function onRender(id, phase, actualDuration) {
+  if (actualDuration > 500) {
+    // Send to monitoring service
+    analytics.log('slow_render', {
+      component: id,
+      duration: actualDuration,
+      phase
+    });
+  }
+}
+
+export default function App() {
+  return (
+    <Profiler id="App" onRender={onRender}>
+      <Header />
+      <ProductList />
+      <Footer />
+    </Profiler>
+  );
+}
+```
+
+### Example 2: Measure Different Sections
+
+```typescript
+function onRender(id, phase, actualDuration, baseDuration) {
+  console.table({
+    'ID': id,
+    'Phase': phase,
+    'Actual': `${actualDuration.toFixed(2)}ms`,
+    'Base': `${baseDuration.toFixed(2)}ms`,
+    'Savings': `${(baseDuration - actualDuration).toFixed(2)}ms`
+  });
+}
+
+export default function Dashboard() {
+  return (
+    <>
+      <Profiler id="Sidebar" onRender={onRender}>
+        <Sidebar />
+      </Profiler>
+
+      <Profiler id="MainContent" onRender={onRender}>
+        <MainContent />
+      </Profiler>
+
+      <Profiler id="RightPanel" onRender={onRender}>
+        <RightPanel />
+      </Profiler>
+    </>
+  );
+}
+```
+
+### Example 3: Send Metrics to Monitoring Service
+
+```typescript
+import { Profiler } from 'react';
+
+const performanceLogger = (id, phase, actualDuration, baseDuration, startTime, commitTime) => {
+  // Send to your service (NewRelic, Datadog, etc)
+  fetch('/api/metrics', {
+    method: 'POST',
+    body: JSON.stringify({
+      component: id,
+      phase,
+      actualDuration,
+      baseDuration,
+      timestamp: new Date().toISOString()
+    })
+  });
+};
+
+export default function App() {
+  return (
+    <Profiler id="App" onRender={performanceLogger}>
+      <YourApp />
+    </Profiler>
+  );
+}
+```
+
+---
+
+## 🏗️ Nested Profilers
+
+You can nest multiple Profilers to measure specific parts:
+
+```typescript
+export default function App() {
+  return (
+    <Profiler id="App" onRender={onRender}>
+      <Header />
+      
+      <Profiler id="Sidebar" onRender={onRender}>
+        <Sidebar />
+      </Profiler>
+
+      <Profiler id="Content" onRender={onRender}>
+        <div>
+          <Profiler id="Editor" onRender={onRender}>
+            <Editor />
+          </Profiler>
+          
+          <Profiler id="Preview" onRender={onRender}>
+            <Preview />
+          </Profiler>
+        </div>
+      </Profiler>
+
+      <Footer />
+    </Profiler>
+  );
+}
+```
+
+When the Editor renders, you'll see:
+1. `onRender` called for "Editor"
+2. `onRender` called for "Content" (parent)
+3. `onRender` called for "App" (grandparent)
+
+---
+
+## ⚠️ Important Considerations
+
+### 1. Overhead in Production
+
+The `<Profiler>` **adds overhead**. In development it's always active, but in production you need to explicitly enable it:
+
+```typescript
+// In development environment
+const ENABLE_PROFILER = process.env.NODE_ENV === 'development';
+
+export default function App() {
+  const Component = (
+    <Header />
+    // ... your components
+  );
+
+  if (ENABLE_PROFILER) {
+    return (
+      <Profiler id="App" onRender={onRender}>
+        {Component}
+      </Profiler>
+    );
+  }
+
+  return Component;
+}
+```
+
+### 2. Does Not Replace DevTools
+
+The `<Profiler>` component is for **programmatically collecting metrics**. For interactive visual analysis, use the React DevTools Profiler.
+
+### 3. Does Not Do Micro-optimizations
+
+The `<Profiler>` measures renders, not code execution:
+
+```typescript
+// ❌ Does not measure this
+function MyComponent() {
+  const result = expensiveCalculation(); // Not measured
+  return <div>{result}</div>;
+}
+
+// ✅ Use useMemo for this
+function MyComponent() {
+  const result = useMemo(() => expensiveCalculation(), []);
+  return <div>{result}</div>;
+}
+```
+
+---
+
+## 📈 Real Case: E-commerce Monitoring
+
+```typescript
+import { Profiler } from 'react';
+
+const performanceAnalytics = {
+  metrics: [],
+  
+  log(id, phase, actualDuration, baseDuration) {
+    this.metrics.push({
+      id,
+      phase,
+      actualDuration,
+      baseDuration,
+      timestamp: Date.now()
+    });
+
+    // Alert if something is too slow
+    if (actualDuration > 1000) {
+      this.alertSlowRender(id, actualDuration);
+    }
+
+    // Send to server every 10 renders
+    if (this.metrics.length >= 10) {
+      this.sendToServer();
+    }
+  },
+
+  alertSlowRender(id, duration) {
+    console.warn(`🐢 ${id} rendered in ${duration}ms`);
+  },
+
+  sendToServer() {
+    fetch('/api/performance', {
+      method: 'POST',
+      body: JSON.stringify(this.metrics)
+    });
+    this.metrics = [];
+  }
+};
+
+function onRender(id, phase, actualDuration, baseDuration) {
+  performanceAnalytics.log(id, phase, actualDuration, baseDuration);
+}
+
+export default function EcommerceSite() {
+  return (
+    <Profiler id="Store" onRender={onRender}>
+      <Header />
+      <Profiler id="ProductListing" onRender={onRender}>
+        <ProductList />
+      </Profiler>
+      <Profiler id="Cart" onRender={onRender}>
+        <ShoppingCart />
+      </Profiler>
+      <Footer />
+    </Profiler>
+  );
+}
+```
+
+---
+
+## 🚀 Comparison: Profiler Component vs React DevTools
+
+| Aspect | Profiler | React DevTools |
+|--------|---------|-----------|
+| **How to use** | Component in code | Visual UI |
+| **When active** | Always (overhead) | Click on DevTools |
+| **Data collected** | Programmatically | Visually analyzable |
+| **Send metrics** | ✅ Easy | ❌ Difficult |
+| **Interactive analysis** | ❌ No | ✅ Yes |
+| **Ideal for** | Continuous monitoring | Debugging |
+| **Performance** | Small overhead | No overhead when inactive |
+
+---
+
+## 🎓 When to Use Profiler Component
+
+### ✅ Use when:
+- You want to **monitor performance in production**
+- Need to **send metrics to a service**
+- Want **automatic alerts** for slow renders
+- Do **A/B testing** of performance
+- Implement **real user monitoring (RUM)**
+
+### ❌ Don't use when:
+- You're just **debugging** locally (use DevTools)
+- Performance is critical and even small overhead matters
+- You just want one-time visual analysis
+
+---
+
+## 📊 Integration with Monitoring Services
+
+### Google Analytics
+
+```typescript
+function onRender(id, phase, actualDuration) {
+  gtag('event', 'component_render', {
+    component_id: id,
+    phase: phase,
+    duration: actualDuration
+  });
+}
+```
+
+### Sentry
+
+```typescript
+import * as Sentry from "@sentry/react";
+
+function onRender(id, phase, actualDuration) {
+  Sentry.captureMessage(`${id} rendered in ${actualDuration}ms`, 'info');
+}
+```
+
+### Datadog
+
+```typescript
+function onRender(id, phase, actualDuration) {
+  if (window.DD_RUM) {
+    window.DD_RUM.addUserAction('component_render', {
+      component: id,
+      duration: actualDuration
+    });
+  }
+}
+```
+
+---
+
+## 🎓 Conclusion
+
+The Profiler component is a powerful tool for:
+
+1. **Monitor performance** automatically
+2. **Collect metrics** in production
+3. **Alert about slow renders**
+4. **Integrate with analysis services**
+
+It doesn't replace React DevTools (which is better for debugging), but it's essential for real-time production monitoring.
+
+**Use Profiler where DevTools can't reach: in production!** 📊
+
+---
+
+## 🔗 Resources
+
+- [React Profiler Documentation](https://react.dev/reference/react/Profiler)
+- [React DevTools Profiler](https://react.dev/learn/react-developer-tools)
+- [Web Vitals](https://web.dev/vitals/)
+- [Sentry Performance Monitoring](https://docs.sentry.io/platforms/javascript/performance/)
+- [Datadog RUM](https://docs.datadoghq.com/real_user_monitoring/)
