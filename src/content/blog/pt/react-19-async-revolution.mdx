@@ -1,0 +1,525 @@
+---
+title: 'React 19: A Revolução Async - use(), Action Hooks e muito mais'
+description: 'Guia completo das novas features do React 19: use() hook, Action Hooks, <Activity>, useEffectEvent. Entenda como acelerar seu código e simplificar estado.'
+date: '2026-02-14'
+tags: ['react', 'javascript', 'async', 'hooks', 'performance']
+locale: 'pt'
+---
+
+# ⚡ React 19: A Revolução Async - use(), Action Hooks e muito mais
+
+React 19 chegou com mudanças significativas que transformam como lidamos com dados assíncronos, gerenciamento de estado e efeitos colaterais. Não são apenas melhorias menores - é uma revolução.
+
+Neste artigo vou guiá-lo pelas 4 principais features que todo React developer precisa conhecer.
+
+---
+
+## 1. O Hook `use()` - Promises Diretamente no Render
+
+### O Problema Anterior
+
+Antes, se você tinha uma promise que precisava ser resolvida antes de renderizar, você usava `useEffect` + estado:
+
+```typescript
+function UserProfile({ dataPromise }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    dataPromise.then(data => {
+      setUser(data);
+      setLoading(false);
+    });
+  }, [dataPromise]);
+
+  if (loading) return <div>Loading...</div>;
+  return <h1>{user.name}</h1>;
+}
+```
+
+**Boilerplate, estado desnecessário, e renderizações extras.**
+
+### A Solução: `use()`
+
+O novo hook `use()` resolve promises **diretamente no render**. React automaticamente suspende o componente até que os dados estejam prontos:
+
+```typescript
+function UserProfile({ dataPromise }) {
+  const user = use(dataPromise);
+  return <h1>{user.name}</h1>;
+}
+```
+
+**É isso.** Uma linha. Sem estados, sem `useEffect`, sem boilerplate.
+
+### Como Funciona
+
+```typescript
+// Com Suspense para loading
+import { Suspense } from 'react';
+
+function App() {
+  const dataPromise = fetchUser();
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UserProfile dataPromise={dataPromise} />
+    </Suspense>
+  );
+}
+
+function UserProfile({ dataPromise }) {
+  // React suspende aqui até que a promise resolve
+  const user = use(dataPromise);
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+```
+
+### use() também funciona com Context
+
+```typescript
+// Sem precisar de null checks
+const theme = use(ThemeContext);
+
+// Context pode ser undefined? use() lida com isso
+const config = use(ConfigContext || DefaultConfig);
+```
+
+---
+
+## 2. Action Hooks - Automação de Formulários
+
+### O Problema
+
+Formulários em React requerem muito boilerplate:
+
+```typescript
+function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setIsPending(true);
+    setError(null);
+
+    try {
+      await login(email, password);
+    } catch (err) {
+      setError(err.message);
+      setIsPending(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        disabled={isPending}
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        disabled={isPending}
+      />
+      <button type="submit" disabled={isPending}>
+        {isPending ? 'Entrando...' : 'Entrar'}
+      </button>
+      {error && <span>{error}</span>}
+    </form>
+  );
+}
+```
+
+**9 linhas de estado para um formulário simples.**
+
+### A Solução: `useActionState`
+
+O novo hook `useActionState` automatiza tudo:
+
+```typescript
+function LoginForm() {
+  const [state, action, isPending] = useActionState(submitForm, null);
+
+  async function submitForm(previousState, formData) {
+    const email = formData.get('email');
+    const password = formData.get('password');
+
+    try {
+      await login(email, password);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  return (
+    <form action={action}>
+      <input type="email" name="email" disabled={isPending} />
+      <input type="password" name="password" disabled={isPending} />
+      <button type="submit" disabled={isPending}>
+        {isPending ? 'Entrando...' : 'Entrar'}
+      </button>
+      {state?.error && <span>{state.error}</span>}
+    </form>
+  );
+}
+```
+
+### O que Muda
+
+- ✅ **Sem mais `useState`** para tracking de estado do formulário
+- ✅ **`isPending` automático** - React rastreia automaticamente
+- ✅ **FormData nativa** - Sem precisar fazer parsing manual
+- ✅ **Otimista UI** - Suporta atualizações otimistas automaticamente
+- ✅ **Reset automático** - Formulário reseta após sucesso
+
+### useTransition para Ações Customizadas
+
+Se você quer mais controle, use `useTransition`:
+
+```typescript
+const [isPending, startTransition] = useTransition();
+
+function handleClick() {
+  startTransition(async () => {
+    await updateUser(data);
+    // A UI atualiza de forma não-bloqueante
+  });
+}
+```
+
+---
+
+## 3. `<Activity>` - Preserve Scroll Sem Re-renderizar
+
+### O Problema
+
+Quando você toggle a visibilidade de componentes, o scroll é perdido:
+
+```typescript
+function Page({ showDetails }) {
+  return (
+    <div>
+      <div>Content...</div>
+      {showDetails && <Details />}
+    </div>
+  );
+}
+
+// Toggle showDetails? Scroll volta para o topo!
+```
+
+### A Solução: `<Activity>`
+
+O novo componente `<Activity>` marca áreas como "hidden" enquanto preserva o estado:
+
+```typescript
+function Page({ showDetails }) {
+  return (
+    <div>
+      <div>Content...</div>
+      <Activity mode={showDetails ? 'visible' : 'hidden'}>
+        <Details />
+      </Activity>
+    </div>
+  );
+}
+
+// showDetails muda? Scroll é preservado!
+```
+
+### Como Funciona
+
+- `mode="visible"` - Componente é renderizado normalmente
+- `mode="hidden"` - Componente é mantido no DOM mas invisível
+- **Scroll é preservado** entre toggles
+- **Estado é mantido** sem re-renderizar
+- **Performance** - Componente hidden não recebe eventos
+
+### Uso Prático
+
+```typescript
+function Sidebar() {
+  const [expanded, setExpanded] = useState(true);
+
+  return (
+    <>
+      <header>
+        <button onClick={() => setExpanded(!expanded)}>
+          {expanded ? 'Collapse' : 'Expand'}
+        </button>
+      </header>
+
+      <Activity mode={expanded ? 'visible' : 'hidden'}>
+        <nav>
+          <ul>
+            {items.map(item => (
+              <li key={item.id}>{item.name}</li>
+            ))}
+          </ul>
+        </nav>
+      </Activity>
+    </>
+  );
+}
+```
+
+---
+
+## 4. `useEffectEvent` - Efeitos Sem Re-execução
+
+### O Problema
+
+Com `useEffect`, você precisa listar todas as dependências:
+
+```typescript
+function SearchResults({ query, onSuccess }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      search(query).then(results => {
+        onSuccess(results); // ⚠️ onSuccess é uma dependência
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [query, onSuccess]); // ⚠️ Se onSuccess muda, efeito re-executa
+
+  // Problema: onSuccess muda a cada render, então efeito rodaria a cada render!
+}
+```
+
+### A Solução: `useEffectEvent`
+
+Extrai lógica não-reativa do efeito:
+
+```typescript
+function SearchResults({ query, onSuccess }) {
+  const handleSuccess = useEffectEvent(results => {
+    onSuccess(results);
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      search(query).then(results => {
+        handleSuccess(results); // ✅ Sem ser dependência
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [query]); // ✅ Apenas query é dependência
+}
+```
+
+### Quando Usar
+
+**Use `useEffectEvent` para:**
+
+- ✅ Callbacks que você quer chamar **sem re-executar** o efeito
+- ✅ Lógica que depende do estado mas **não deve re-executar** o efeito
+- ✅ Manter `dependencies` array limpo e focado
+
+**Não use para:**
+
+- ❌ Lógica síncrona no render (use funções normais)
+- ❌ Valores que precisam ser reativas (deixe em `dependencies`)
+
+### Exemplo Real: Analytics
+
+```typescript
+function Component({ userId, tracking }) {
+  const logEvent = useEffectEvent((eventName, data) => {
+    tracking.log(eventName, {
+      userId,
+      timestamp: Date.now(),
+      ...data,
+    });
+  });
+
+  useEffect(() => {
+    logEvent('component_mounted');
+
+    return () => logEvent('component_unmounted');
+  }, []); // tracking não é dependência!
+}
+```
+
+---
+
+## 🚀 Migration Path: 3 Passos
+
+React 19 foi pensada para coexistir com código antigo. Aqui está como migrar:
+
+### STEP 1: Refatore Formulários Complexos Primeiro
+
+Comece com `useActionState` em formulários. É a mudança mais impactante:
+
+```typescript
+// ❌ Antes
+const [state, setState] = useState(null);
+const [isPending, setIsPending] = useState(false);
+
+// ✅ Depois
+const [state, action, isPending] = useActionState(handleSubmit, null);
+```
+
+### STEP 2: Adote Suspense Boundaries
+
+Mude para Suspense + `use()` para carregamento de dados:
+
+```typescript
+// ❌ Antes
+const [data, setData] = useState(null);
+useEffect(() => {
+  /* fetch */
+}, []);
+
+// ✅ Depois
+const data = use(dataPromise);
+```
+
+Envolva com `<Suspense>` para fallback loading.
+
+### STEP 3: Mantenha Código Antigo Funcionando
+
+Novas features funcionam alongside código antigo. Não precisa reescrever tudo no dia 1.
+
+---
+
+## 📊 Comparação: React 18 vs React 19
+
+| Feature           | React 18              | React 19             |
+| ----------------- | --------------------- | -------------------- |
+| Dados Assíncronos | useEffect + useState  | use() + Suspense     |
+| Formulários       | Muito boilerplate     | useActionState       |
+| Preserve State    | Difícil               | Activity simples     |
+| Efeito + Callback | Dependências confusas | useEffectEvent       |
+| Bundle Size       | Baseline              | +~10KB (vale a pena) |
+
+---
+
+## ⚠️ Importante: Suspense Boundaries
+
+React 19 torna Suspense mais importante. Sempre envolva com fallbacks:
+
+```typescript
+// ✅ BOM
+<Suspense fallback={<Loading />}>
+  <UserProfile dataPromise={promise} />
+</Suspense>
+
+// ❌ RUIM - Sem Suspense boundary
+<UserProfile dataPromise={promise} /> // Erro se não houver fallback
+```
+
+---
+
+## 💡 Real-World Example: Complete Form
+
+```typescript
+'use client'; // Next.js App Router
+
+import { useActionState, useTransition } from 'react';
+import { Suspense } from 'react';
+
+function CreatePostForm({ onSuccess }) {
+  const [state, formAction, isPending] = useActionState(
+    submitPost,
+    null
+  );
+
+  async function submitPost(previousState, formData) {
+    const title = formData.get('title');
+    const content = formData.get('content');
+
+    if (!title || !content) {
+      return { error: 'Title and content are required' };
+    }
+
+    try {
+      const post = await createPost({ title, content });
+      onSuccess(post);
+      return { success: true, post };
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+
+  return (
+    <form action={formAction}>
+      <input
+        type="text"
+        name="title"
+        placeholder="Post title"
+        required
+        disabled={isPending}
+      />
+
+      <textarea
+        name="content"
+        placeholder="Post content"
+        required
+        disabled={isPending}
+      />
+
+      <button type="submit" disabled={isPending}>
+        {isPending ? 'Publishing...' : 'Publish'}
+      </button>
+
+      {state?.error && (
+        <div className="error">{state.error}</div>
+      )}
+
+      {state?.success && (
+        <div className="success">Post published!</div>
+      )}
+    </form>
+  );
+}
+
+// Uso com Suspense
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreatePostForm onSuccess={handleSuccess} />
+    </Suspense>
+  );
+}
+```
+
+---
+
+## 🎓 Conclusão
+
+React 19 não é apenas uma atualização - é uma mudança de paradigma:
+
+1. **`use()`** - Async data sem boilerplate
+2. **Action Hooks** - Formulários simplificados em 80%
+3. **`<Activity>`** - State preservation automático
+4. **`useEffectEvent`** - Efeitos mais previsíveis
+
+A curva de aprendizado é pequena, mas o impacto é enorme. Se você está em React 18, considere atualizar quando estiver confortável.
+
+**A era de "useEffect + useState" para tudo está acabando.**
+
+Bem-vindo a React 19. ⚡
+
+---
+
+## 🔗 Recursos
+
+- [React 19 Documentation](https://react.dev)
+- [use() Hook RFC](https://github.com/facebook/react/pull/25360)
+- [Actions RFC](https://github.com/facebook/react/issues/26739)
+- [Suspense Documentation](https://react.dev/reference/react/Suspense)

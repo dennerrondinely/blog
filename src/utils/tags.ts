@@ -128,6 +128,18 @@ const tagColors: Record<string, TagColor> = {
     background: 'bg-zinc-100 dark:bg-zinc-900',
     text: 'text-zinc-800 dark:text-zinc-100',
   },
+  'state-management': {
+    background: 'bg-orange-100 dark:bg-orange-900',
+    text: 'text-orange-800 dark:text-orange-100',
+  },
+  zustand: {
+    background: 'bg-red-100 dark:bg-red-900',
+    text: 'text-red-800 dark:text-red-100',
+  },
+  async: {
+    background: 'bg-purple-100 dark:bg-purple-900',
+    text: 'text-purple-800 dark:text-purple-100',
+  },
 };
 
 export function getTagColors(tag: string): TagColor {

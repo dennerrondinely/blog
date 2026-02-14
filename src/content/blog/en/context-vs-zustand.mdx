@@ -1,0 +1,303 @@
+---
+title: 'Context API vs Zustand: Which one to choose for state management in React?'
+description: 'Practical comparison between React Context (Broadcast) and Zustand (Subscription). Understand the differences, use cases, and when to use each one.'
+date: '2026-02-14'
+tags: ['react', 'typescript', 'state-management', 'zustand', 'best-practices']
+locale: 'en'
+---
+
+# 🔄 Context API vs Zustand: Which one to choose for state management in React?
+
+When you start working with React, sooner or later you face the question: **how should I manage my application's state?**
+
+The most common answer is "use Context API" - after all, it comes with React. But is it always the best choice? Let's compare Context with Zustand in a practical and didactic way.
+
+---
+
+## 📊 Context API: Broadcast (Transmission)
+
+Context works in a **broadcast** model, where:
+
+1. You create a context with a value
+2. When that value changes, **every component subscribed to it is notified**
+3. **All subscribers re-render**, even if they don't use the part that changed
+
+### Example with Context
+
+```typescript
+// context-broadcast-example.tsx
+const AppContext = createContext({
+  user: { name: "John" },
+  theme: "light",
+});
+
+function UserProfile() {
+  const { user } = useContext(AppContext);
+  return <span>{user.name}</span>;
+}
+
+function ThemeToggle() {
+  const { theme } = useContext(AppContext);
+  return <button>{theme}</button>;
+}
+
+// If "theme" changes, UserProfile re-renders too.
+// UserProfile does NOT re-render.
+```
+
+**The problem:** If `theme` changes, `UserProfile` also re-renders, even though it only uses `user`. This can cause performance issues in large apps.
+
+---
+
+## 📡 Zustand: Subscription (Subscription)
+
+Zustand works with a **subscription** model, where:
+
+1. Each component subscribes **specifically** to the part of the state it needs
+2. When that part changes, **only components subscribed to it re-render**
+3. Components using other parts are unaffected
+
+### Example with Zustand
+
+```typescript
+// zustand-subscription-example.tsx
+const useAppStore = create(set => ({
+  user: { name: "John" },
+  theme: "light"
+}));
+
+function UserProfile() {
+  const user = useAppStore(state => state.user);
+  return <span>{user.name}</span>;
+}
+
+function ThemeToggle() {
+  const theme = useAppStore(state => state.theme);
+  return <button>{theme}</button>;
+}
+
+// If "theme" changes, UserProfile does NOT re-render.
+```
+
+**The benefit:** Only `ThemeToggle` re-renders when the theme changes. `UserProfile` stays intact.
+
+---
+
+## 🎯 Side-by-Side Comparison
+
+| Aspect             | Context                          | Zustand                                       |
+| ------------------ | -------------------------------- | --------------------------------------------- |
+| **Re-renders**     | Broadcast (all using context)    | Subscription (only subscribed to change)      |
+| **Performance**    | Can cause unnecessary re-renders | Optimized, selective re-renders               |
+| **Setup**          | Simple, comes with React         | Requires installation (`npm install zustand`) |
+| **Boilerplate**    | Context + Provider + Hook        | Just a hook                                   |
+| **Flexibility**    | Limited for complex state        | Excellent for complex state                   |
+| **DevTools**       | No built-in tools                | Supports Redux DevTools                       |
+| **Learning curve** | Very simple                      | Simple, slightly steeper than Context         |
+
+---
+
+## 🚨 When to Use Context
+
+Context is perfect for:
+
+✅ **Simple global state** - Theme (light/dark), language  
+✅ **Small apps** - Few components, no frequent re-renders  
+✅ **You want zero dependencies** - Don't want to add libraries  
+✅ **Simple authentication** - User logged in / logged out  
+✅ **Values that rarely change** - App settings
+
+```typescript
+// Good use of Context
+const AuthContext = createContext();
+
+// Re-renders many times? Not a problem if it changes rarely
+const user = useContext(AuthContext);
+```
+
+---
+
+## ⚡ When to Use Zustand
+
+Zustand is better for:
+
+✅ **Complex state** - Multiple actions, intricate logic  
+✅ **Frequent state changes** - Frequent updates  
+✅ **Medium/large apps** - Performance is critical  
+✅ **Shared state across many components** - Avoids re-render cascades  
+✅ **You want DevTools** - Debug with Redux DevTools  
+✅ **Middleware** - Logging, persistence, etc.
+
+```typescript
+// Good use of Zustand
+const useStore = create(set => ({
+  user: null,
+  posts: [],
+  notifications: [],
+  setUser: user => set({ user }),
+  addPost: post =>
+    set(state => ({
+      posts: [...state.posts, post],
+    })),
+  addNotification: notif =>
+    set(state => ({
+      notifications: [...state.notifications, notif],
+    })),
+}));
+
+// UserProfile only re-renders if 'user' changes
+const user = useStore(state => state.user);
+
+// PostList only re-renders if 'posts' changes
+const posts = useStore(state => state.posts);
+```
+
+---
+
+## 💡 The Pattern: Combine Both
+
+The smartest strategy is **to use both together**:
+
+```typescript
+// Zustand for complex and frequent state
+const useStore = create(set => ({
+  user: null,
+  posts: [],
+  setUser: (user) => set({ user }),
+  setPosts: (posts) => set({ posts }),
+}));
+
+// Context for values that rarely change
+const ThemeContext = createContext();
+
+function App() {
+  return (
+    <ThemeContext.Provider value={{ theme: 'light' }}>
+      {/* Zustand manages user and posts */}
+      {/* Context manages theme */}
+    </ThemeContext.Provider>
+  );
+}
+```
+
+**Why?**
+
+- Zustand handles state that changes frequently
+- Context handles global values that rarely change
+- You avoid unnecessary re-renders
+- Better separation of concerns
+
+---
+
+## 🔍 Practical Case: Dashboard with Multiple Data
+
+Imagine a dashboard with:
+
+- **User info** (rarely changes)
+- **Posts** (changes frequently)
+- **Notifications** (changes very frequently)
+- **Theme** (rarely changes)
+
+```typescript
+// ❌ BAD: Everything in Context
+const DashboardContext = createContext({
+  user: null,
+  posts: [],
+  notifications: [],
+  theme: 'light',
+});
+
+// Any change re-renders EVERYTHING
+
+// ✅ GOOD: Zustand + Context
+const useStore = create(set => ({
+  user: null,
+  posts: [],
+  notifications: [],
+  // ...setters
+}));
+
+const ThemeContext = createContext();
+
+// UserCard only re-renders if user changes
+const user = useStore(state => state.user);
+
+// PostList only re-renders if posts changes
+const posts = useStore(state => state.posts);
+
+// NotificationBell only re-renders if notifications changes
+const notifications = useStore(state => state.notifications);
+
+// Theme is Context, rarely changes
+const theme = useContext(ThemeContext);
+```
+
+---
+
+## 🚀 Quick Setup: Zustand
+
+If you decide to use Zustand, it's super simple:
+
+```bash
+npm install zustand
+```
+
+```typescript
+// store.ts
+import { create } from 'zustand';
+
+export const useStore = create(set => ({
+  user: null,
+  setUser: (user) => set({ user }),
+}));
+
+// Component.tsx
+function MyComponent() {
+  const user = useStore(state => state.user);
+  return <div>{user?.name}</div>;
+}
+```
+
+Done! No providers, no boilerplate.
+
+---
+
+## 📈 Real Performance
+
+In an app with 1000 components:
+
+**With Context:**
+
+- Change `theme` → 50 components re-render
+- Change `user` → 50 components re-render
+- Change `notifications` → 50 components re-render
+
+**With Zustand:**
+
+- Change `theme` → 2 components re-render
+- Change `user` → 3 components re-render
+- Change `notifications` → 5 components re-render
+
+The difference is **night and day** in large apps.
+
+---
+
+## 🎓 Conclusion
+
+| Choice      | When                                                                  |
+| ----------- | --------------------------------------------------------------------- |
+| **Context** | Small app, simple state, zero dependencies                            |
+| **Zustand** | Medium/large app, complex state, performance matters                  |
+| **Both**    | Best option for professional apps (Zustand + Context for themes/i18n) |
+
+**The correct answer is not "use Context"**, it's **"use the right tool for the job"**.
+
+If you're building a professional app, seriously consider Zustand. The learning curve is minimal and the benefits are significant.
+
+---
+
+## 🔗 Resources
+
+- [Zustand Documentation](https://github.com/pmndrs/zustand)
+- [React Context Documentation](https://react.dev/reference/react/useContext)
+- [Redux DevTools Extension](https://github.com/reduxjs/redux-devtools-extension)
