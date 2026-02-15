@@ -44,5 +44,66 @@
     "light": "Claro",
     "dark": "Escuro",
     "system": "Sistema"
+  },
+  "about": {
+    "title": "Sobre Mim",
+    "subtitle": "Desenvolvedor Front-End sênior apaixonado por transformar ideias em experiências digitais bem estruturadas, performáticas e sustentáveis",
+    "intro": "Olá! Eu sou Dênner Rondinely 👋",
+    "philosophy": "Sou desenvolvedor Front-End sênior apaixonado por transformar ideias em experiências digitais bem estruturadas, performáticas e sustentáveis. Acredito que escrever código vai muito além de 'fazer funcionar'. Para mim, envolve clareza, arquitetura, boas decisões técnicas e, principalmente, responsabilidade com quem vai manter aquilo no futuro — inclusive eu mesmo.",
+    "journey": {
+      "title": "Minha Jornada",
+      "description": "Minha trajetória na tecnologia começou movida por curiosidade. Eu sempre quis entender como as coisas funcionam por trás da interface. Com o tempo, essa curiosidade se transformou em foco profissional:",
+      "skill1": "Construção de aplicações com React e TypeScript",
+      "skill2": "Arquitetura Front-End escalável",
+      "skill3": "Boas práticas, testes e performance",
+      "skill4": "Design de APIs e integração com back-end",
+      "skill5": "Criação de bibliotecas e ferramentas para desenvolvedores",
+      "goal": "Hoje, meu objetivo não é apenas entregar features — é criar soluções que façam sentido no longo prazo."
+    },
+    "pillars": {
+      "title": "Código, Café e Curiosidade",
+      "intro": "O nome deste blog não é por acaso. Ele representa três pilares da minha rotina:",
+      "code": {
+        "title": "Código",
+        "description": "A prática diária de melhorar como engenheiro."
+      },
+      "coffee": {
+        "title": "Café",
+        "description": "O combustível das boas decisões arquiteturais (ou pelo menos das tentativas 😄)."
+      },
+      "curiosity": {
+        "title": "Curiosidade",
+        "description": "O que me move a estudar novas abordagens, padrões e tecnologias."
+      },
+      "description": "Aqui compartilho aprendizados práticos, comparações técnicas, reflexões sobre arquitetura e experiências reais do dia a dia como desenvolvedor."
+    },
+    "content": {
+      "title": "O que você vai encontrar por aqui",
+      "intro": "Neste blog eu escrevo sobre:",
+      "topic1": "React (incluindo novidades como React 19)",
+      "topic2": "Gerenciamento de estado",
+      "topic3": "Performance e profiling",
+      "topic4": "Padrões e arquitetura Front-End",
+      "topic5": "Boas práticas com TypeScript",
+      "topic6": "Experimentos e ideias open source",
+      "topic7": "Reflexões sobre engenharia de software",
+      "approach": "Sempre com foco prático. Sem hype. Sem 'copiar documentação'.",
+      "promise": "A ideia é simplificar o complexo e aprofundar o que realmente importa."
+    },
+    "beyond": {
+      "title": "Além do Código",
+      "intro": "Também me interesso por:",
+      "interest1": "Criação de ferramentas para a comunidade",
+      "interest2": "Educação técnica e compartilhamento de conhecimento",
+      "interest3": "Experimentos com bibliotecas e automação",
+      "interest4": "Projetos que combinam produto + engenharia",
+      "belief": "Acredito que compartilhar conhecimento é uma das formas mais poderosas de evoluir na carreira."
+    },
+    "connect": {
+      "title": "Vamos nos Conectar",
+      "description": "Se você também gosta de discutir arquitetura, padrões, performance ou simplesmente quer trocar ideias sobre tecnologia, será um prazer conversar. Você pode me encontrar em:",
+      "projects": "Ou explore meus projetos na seção de",
+      "projectsLink": "Projetos"
+    }
   }
 }

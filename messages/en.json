@@ -44,5 +44,66 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "Senior Front-End developer passionate about transforming ideas into well-structured, performant and sustainable digital experiences",
+    "intro": "Hello! I'm Dênner Rondinely 👋",
+    "philosophy": "I'm a senior Front-End developer passionate about transforming ideas into well-structured, performant and sustainable digital experiences. I believe that writing code goes far beyond 'making it work'. For me, it involves clarity, architecture, good technical decisions and, most importantly, responsibility to those who will maintain it in the future — including myself.",
+    "journey": {
+      "title": "My Journey",
+      "description": "My trajectory in technology started driven by curiosity. I've always wanted to understand how things work behind the interface. Over time, this curiosity transformed into professional focus:",
+      "skill1": "Building applications with React and TypeScript",
+      "skill2": "Scalable Front-End architecture",
+      "skill3": "Best practices, testing and performance",
+      "skill4": "API design and back-end integration",
+      "skill5": "Creating libraries and tools for developers",
+      "goal": "Today, my goal is not just to deliver features — it's to create solutions that make sense in the long run."
+    },
+    "pillars": {
+      "title": "Code, Coffee and Curiosity",
+      "intro": "This blog's name is no accident. It represents three pillars of my routine:",
+      "code": {
+        "title": "Code",
+        "description": "The daily practice of improving as an engineer."
+      },
+      "coffee": {
+        "title": "Coffee",
+        "description": "The fuel for good architectural decisions (or at least the attempts 😄)."
+      },
+      "curiosity": {
+        "title": "Curiosity",
+        "description": "What drives me to study new approaches, patterns and technologies."
+      },
+      "description": "Here I share practical learnings, technical comparisons, architectural reflections and real-world experiences as a developer."
+    },
+    "content": {
+      "title": "What you'll find here",
+      "intro": "In this blog I write about:",
+      "topic1": "React (including new features like React 19)",
+      "topic2": "State management",
+      "topic3": "Performance and profiling",
+      "topic4": "Front-End patterns and architecture",
+      "topic5": "TypeScript best practices",
+      "topic6": "Experiments and open source ideas",
+      "topic7": "Reflections on software engineering",
+      "approach": "Always with practical focus. No hype. No 'copying documentation'.",
+      "promise": "The idea is to simplify the complex and deepen what really matters."
+    },
+    "beyond": {
+      "title": "Beyond Code",
+      "intro": "I'm also interested in:",
+      "interest1": "Creating tools for the community",
+      "interest2": "Technical education and knowledge sharing",
+      "interest3": "Experiments with libraries and automation",
+      "interest4": "Projects that combine product + engineering",
+      "belief": "I believe that sharing knowledge is one of the most powerful ways to evolve in your career."
+    },
+    "connect": {
+      "title": "Let's Connect",
+      "description": "If you also enjoy discussing architecture, patterns, performance or simply want to exchange ideas about technology, it will be a pleasure to talk. You can find me on:",
+      "projects": "Or explore my projects in the",
+      "projectsLink": "Projects"
+    }
   }
 }
