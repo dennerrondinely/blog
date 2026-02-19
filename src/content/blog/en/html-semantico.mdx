@@ -1,0 +1,425 @@
+---
+title: 'Semantic HTML: Why It Matters Beyond "Making It Work"'
+description: 'Understand the difference between semantic and non-semantic HTML, why semantics matter for accessibility, SEO, and code maintainability.'
+date: '2026-02-19'
+tags: ['html', 'web-standards', 'accessibility', 'best-practices', 'semantic-html']
+locale: 'en'
+coverImage: '/blog/capas/html-semantico.png'
+---
+
+# 🏗 Semantic HTML: Why It Matters Beyond "Making It Work"
+
+How many times have you seen a website work perfectly with `<div>` for everything? Many, right?
+
+But here's the problem: **working visually is not enough**. There's a profound difference between making something "work" and making it **right**.
+
+In this post, we'll explore what semantic HTML is, why it matters, and how to implement it better.
+
+---
+
+## 🤔 What is Semantic HTML?
+
+Semantic HTML is when you use **tags that describe the meaning of content**, not just its appearance.
+
+### Non-Semantic
+
+```html
+<div>
+  <span>Menu</span>
+  <div>
+    <div>
+      <div>Home</div>
+      <div>Blog</div>
+      <div>About</div>
+    </div>
+  </div>
+</div>
+```
+
+### Semantic
+
+```html
+<header>
+  <h1>My Blog</h1>
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+  </nav>
+</header>
+```
+
+The visual structure can be identical, but **semantically they are worlds apart**.
+
+---
+
+## 🎯 Why Semantic HTML Matters?
+
+### 1. **Accessibility** ♿
+
+Screen readers and assistive technologies **depend on semantic HTML** to understand the page.
+
+**With non-semantic HTML:**
+
+```
+A visually impaired user hears: "div, span, div, div..."
+No context. No sense. Frustrating.
+```
+
+**With semantic HTML:**
+
+```
+"Header, navigation, list of 3 links: Home, Blog, About"
+Clear. Logical. Works.
+```
+
+People with visual disabilities represent a significant portion of users. Ignoring them is ignoring accessibility.
+
+### 2. **SEO** 🔍
+
+Search engines use semantic tags to **understand structure and content importance**.
+
+```html
+<!-- Bad for SEO -->
+<div class="title">My Article</div>
+
+<!-- Good for SEO -->
+<h1>My Article</h1>
+```
+
+Google prefers:
+
+- Clear title hierarchy (`<h1>`, `<h2>`, `<h3>`)
+- Well-defined sections with `<section>`, `<article>`
+- Structured navigation with `<nav>`
+- Explicit footer with `<footer>`
+
+### 3. **Maintainability** 🔧
+
+Semantic code is **self-explanatory**.
+
+```html
+<!-- You need to read CSS/JS to understand -->
+<div class="main-wrapper">
+  <div class="left-column">
+    <div class="article-item"></div>
+  </div>
+</div>
+
+<!-- Obvious just by reading -->
+<main>
+  <aside>
+    <article></article>
+  </aside>
+</main>
+```
+
+Future developers (including yourself in 6 months) will thank you.
+
+### 4. **Legacy Browser Compatibility** 📱
+
+Older browsers handle semantic HTML better. Less chance of unexpected bugs.
+
+### 5. **Clear Structure for Machines** 🤖
+
+APIs, web scrapers, analysis tools — everything works better with semantics.
+
+---
+
+## 📋 Important Semantic Tags
+
+### Page Structure
+
+```html
+<header>
+  <!-- Page/section header -->
+  <nav>
+    <!-- Navigation -->
+    <main>
+      <!-- Main content (one per page) -->
+      <article>
+        <!-- Independent content (post, news) -->
+        <section>
+          <!-- Thematic grouping -->
+          <aside>
+            <!-- Sidebar content -->
+            <footer><!-- Footer --></footer>
+          </aside>
+        </section>
+      </article>
+    </main>
+  </nav>
+</header>
+```
+
+### Content
+
+```html
+<h1>
+  ,
+  <h2>
+    , ...
+    <h6>
+      <!-- Title hierarchy -->
+      <p>
+        <!-- Paragraph -->
+        <figure>
+          <!-- Image with caption -->
+          <figcaption>
+            <!-- Figure caption -->
+            <blockquote>
+              <!-- Block quote -->
+              <cite>
+                <!-- Quote source -->
+                <code
+                  >,
+                  <pre>>
+                </code></cite
+              >
+            </blockquote>
+          </figcaption>
+        </figure>
+      </p>
+    </h6>
+  </h2>
+</h1>
+```
+
+---
+
+## ✅ Complete Example: Blog Page
+
+### ❌ Non-Semantic
+
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <div class="header">
+      <div class="title">My Blog</div>
+      <div class="menu">
+        <span class="item">Home</span>
+        <span class="item">Blog</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="post">
+        <div class="post-title">Semantic HTML</div>
+        <div class="post-date">February 19</div>
+        <div class="post-body">Content here...</div>
+      </div>
+
+      <div class="sidebar">
+        <div class="widget-title">Recent Posts</div>
+        <div class="item">Post 1</div>
+        <div class="item">Post 2</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>Copyright 2026</div>
+    </div>
+  </body>
+</html>
+```
+
+### ✅ Semantic
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Blog</title>
+  </head>
+  <body>
+    <header>
+      <h1>My Blog</h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/blog">Blog</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article>
+        <h1>Semantic HTML</h1>
+        <time datetime="2026-02-19">February 19, 2026</time>
+        <p>Content here...</p>
+      </article>
+
+      <aside>
+        <h2>Recent Posts</h2>
+        <ul>
+          <li><a href="/post-1">Post 1</a></li>
+          <li><a href="/post-2">Post 2</a></li>
+        </ul>
+      </aside>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 My Blog. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
+```
+
+---
+
+## 🎓 Best Practices
+
+### 1. **Use `<section>` with `<h1>-<h6>`**
+
+```html
+<!-- Good -->
+<section>
+  <h2>About the Project</h2>
+  <p>Description...</p>
+</section>
+
+<!-- Bad - section without title -->
+<section>
+  <div class="title">About</div>
+  <p>Description...</p>
+</section>
+```
+
+### 2. **Use `<article>` for Independent Content**
+
+```html
+<!-- Each post is independent -->
+<article>
+  <header>
+    <h1>Post Title</h1>
+    <time datetime="2026-02-19">February 19</time>
+  </header>
+  <p>Content...</p>
+</article>
+```
+
+### 3. **Use `<nav>` for Navigation**
+
+```html
+<!-- Identifiable for screen readers -->
+<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</nav>
+```
+
+### 4. **Use `<figure>` for Meaningful Images**
+
+```html
+<figure>
+  <img src="chart.png" alt="Growth chart" />
+  <figcaption>User growth in 2026</figcaption>
+</figure>
+```
+
+### 5. **Use `<time>` for Dates**
+
+```html
+<time datetime="2026-02-19T12:53:00Z"> February 19, 2026 </time>
+```
+
+---
+
+## 🔍 Testing Semantics
+
+### Extension: Accessibility Inspector (Firefox/Chrome)
+
+Checks your site's accessibility tree.
+
+### Tool: WebAIM WAVE
+
+```
+https://wave.webaim.org/
+```
+
+Shows accessibility issues visually.
+
+### Browser DevTools
+
+```
+F12 → Accessibility → Show Accessibility Tree
+```
+
+---
+
+## 📊 Visual Comparison
+
+| Aspect            | Non-Semantic        | Semantic   |
+| ----------------- | ------------------- | ---------- |
+| **Accessibility** | ❌ Incomprehensible | ✅ Clear   |
+| **SEO**           | ⚠️ Weak             | ✅ Strong  |
+| **Maintenance**   | ⚠️ Confusing        | ✅ Obvious |
+| **Performance**   | ➖ Equal            | ➖ Equal   |
+| **Mobile**        | ➖ Equal            | ➖ Equal   |
+
+---
+
+## 🧠 The Right Mindset
+
+Semantic HTML is not about:
+
+- ❌ Visuals (that's CSS)
+- ❌ Interactivity (that's JavaScript)
+- ❌ Performance (barely affects it)
+
+Semantic HTML is about:
+
+- ✅ **Meaning**
+- ✅ **Accessibility**
+- ✅ **Maintainability**
+- ✅ **Compatibility**
+
+---
+
+## 💡 Conclusion
+
+You can build an entire website with `<div>`:
+
+```html
+<div>
+  <div>
+    <div>
+      <div>
+        <!-- Entire site here -->
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+**But you shouldn't.**
+
+Semantic HTML is the foundation of responsible code:
+
+- People with disabilities can use it
+- Search engines understand your content
+- Developers can maintain it
+- Machines can process it
+
+Writing semantic HTML takes **a few seconds longer** to write, but saves **days** in future maintenance and compatibility.
+
+**Always choose semantics.**
+
+---
+
+## 🔗 Resources
+
+- [MDN: Semantic HTML](https://developer.mozilla.org/en-US/docs/Glossary/Semantics)
+- [W3C: HTML Standards](https://html.spec.whatwg.org/)
+- [WebAIM: Semantic HTML](https://webaim.org/articles/semanticHTML/)
+- [A11y: Web Accessibility](https://www.a11y-101.com/)
+
+---
+
+_Have you ever dealt with a website made entirely with divs? Share your experience in the comments!_ 👇
