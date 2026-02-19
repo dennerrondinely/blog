@@ -4,7 +4,7 @@ description: 'Learn how to solve a technical interview challenge: reverse string
 date: '2026-02-14'
 tags: ['javascript', 'algorithms', 'interviews', 'problem-solving', 'strings']
 locale: 'en'
-coverImage: '/blog/capas/reverse-string-interview.jpg'
+coverImage: '/blog/cover/reverse-string-interview.png'
 ---
 
 # 💡 Interview Challenge: Reverse Strings with Specific Rules
@@ -27,23 +27,23 @@ Create a function that:
 
 ```javascript
 // Example 1: Simple word
-reverseString("hello") 
+reverseString('hello');
 // Expected: "olleh"
 
 // Example 2: Multiple words
-reverseString("hello world")
+reverseString('hello world');
 // Expected: "olleh dlrow"
 
 // Example 3: With special characters (they don't move!)
-reverseString("he-llo")
+reverseString('he-llo');
 // Expected: "ol-leh"
 
 // Example 4: Multiple words with special characters
-reverseString("hello-world test")
+reverseString('hello-world test');
 // Expected: "olleh-dlrow tset"
 
 // Example 5: Special characters keep position
-reverseString("a-b-c")
+reverseString('a-b-c');
 // Expected: "c-b-a"
 ```
 
@@ -62,6 +62,7 @@ Let's understand better with the example `"he-llo"`:
 5. Reinsert `-` at position 2: `o`, `l`, `-`, `l`, `e`, `h` → `"ol-leh"`
 
 **Strategy:**
+
 1. Split the string into words
 2. For each word:
    - Extract only alphabetic characters
@@ -78,18 +79,18 @@ Let's understand better with the example `"he-llo"`:
 ```javascript
 function reverseString(str) {
   return str
-    .split(' ')                           // Split by spaces
-    .map(word => reverseWord(word))       // Reverse each word
-    .join(' ');                           // Join back with spaces
+    .split(' ') // Split by spaces
+    .map(word => reverseWord(word)) // Reverse each word
+    .join(' '); // Join back with spaces
 }
 
 function reverseWord(word) {
   // Extract only alphabetic characters
   const letters = word.split('').filter(char => /[a-zA-Z]/.test(char));
-  
+
   // Reverse the alphabetic characters
   letters.reverse();
-  
+
   // Rebuild the word
   let letterIndex = 0;
   return word
@@ -104,12 +105,13 @@ function reverseWord(word) {
 }
 
 // Test
-console.log(reverseString("hello world"));        // "olleh dlrow"
-console.log(reverseString("he-llo"));             // "ol-leh"
-console.log(reverseString("hello-world test"));   // "olleh-dlrow tset"
+console.log(reverseString('hello world')); // "olleh dlrow"
+console.log(reverseString('he-llo')); // "ol-leh"
+console.log(reverseString('hello-world test')); // "olleh-dlrow tset"
 ```
 
 **How it works:**
+
 1. `reverseString()` splits the string by spaces and processes each word
 2. `reverseWord()` extracts letters, reverses them, and rebuilds keeping specials in place
 3. Uses regex `/[a-zA-Z]/` to identify alphabetic characters
@@ -123,9 +125,15 @@ function reverseString(str) {
   return str
     .split(' ')
     .map(word => {
-      const letters = word.split('').filter(c => /[a-zA-Z]/).reverse();
+      const letters = word
+        .split('')
+        .filter(c => /[a-zA-Z]/)
+        .reverse();
       let i = 0;
-      return word.split('').map(c => /[a-zA-Z]/.test(c) ? letters[i++] : c).join('');
+      return word
+        .split('')
+        .map(c => (/[a-zA-Z]/.test(c) ? letters[i++] : c))
+        .join('');
     })
     .join(' ');
 }
@@ -149,21 +157,19 @@ function reverseWord(word, preserveChars) {
   // Extract only characters that are NOT preserved
   const chars = word.split('').filter(char => !preserveChars.test(char));
   chars.reverse();
-  
+
   // Rebuild
   let charIndex = 0;
   return word
     .split('')
-    .map(char => 
-      preserveChars.test(char) ? char : chars[charIndex++]
-    )
+    .map(char => (preserveChars.test(char) ? char : chars[charIndex++]))
     .join('');
 }
 
 // Usage
-console.log(reverseString("hello-world")); // "olleh-dlrow"
+console.log(reverseString('hello-world')); // "olleh-dlrow"
 // Customize: only keep numbers
-console.log(reverseString("hel3lo w0rld", /[0-9]/)); // "0lrw dl3leh"
+console.log(reverseString('hel3lo w0rld', /[0-9]/)); // "0lrw dl3leh"
 ```
 
 ---
@@ -172,37 +178,37 @@ console.log(reverseString("hel3lo w0rld", /[0-9]/)); // "0lrw dl3leh"
 
 ```javascript
 // Basic cases
-console.assert(reverseString("hello") === "olleh", "Simple word");
-console.assert(reverseString("hello world") === "olleh dlrow", "Multiple words");
+console.assert(reverseString('hello') === 'olleh', 'Simple word');
+console.assert(reverseString('hello world') === 'olleh dlrow', 'Multiple words');
 
 // With special characters
-console.assert(reverseString("he-llo") === "ol-leh", "Hyphen in middle");
-console.assert(reverseString("hello!") === "olleh!", "Punctuation at end");
-console.assert(reverseString("h-e-l-l-o") === "o-l-l-e-h", "Multiple hyphens");
+console.assert(reverseString('he-llo') === 'ol-leh', 'Hyphen in middle');
+console.assert(reverseString('hello!') === 'olleh!', 'Punctuation at end');
+console.assert(reverseString('h-e-l-l-o') === 'o-l-l-e-h', 'Multiple hyphens');
 
 // Complex cases
 console.assert(
-  reverseString("hello-world test!") === "olleh-dlrow tset!",
-  "Multiple words with special chars"
+  reverseString('hello-world test!') === 'olleh-dlrow tset!',
+  'Multiple words with special chars'
 );
 
 // Empty and edge cases
-console.assert(reverseString("") === "", "Empty string");
-console.assert(reverseString("a") === "a", "Single character");
-console.assert(reverseString("!!!") === "!!!", "Only special chars");
-console.assert(reverseString("-a-b-c-") === "-c-b-a-", "Special chars at extremes");
+console.assert(reverseString('') === '', 'Empty string');
+console.assert(reverseString('a') === 'a', 'Single character');
+console.assert(reverseString('!!!') === '!!!', 'Only special chars');
+console.assert(reverseString('-a-b-c-') === '-c-b-a-', 'Special chars at extremes');
 
-console.log("✅ All tests passed!");
+console.log('✅ All tests passed!');
 ```
 
 ---
 
 ## 📊 Complexity Analysis
 
-| Aspect | Complexity | Explanation |
-|--------|------------|-------------|
-| **Time** | O(n) | Traverses the string once |
-| **Space** | O(n) | Creates temporary arrays |
+| Aspect    | Complexity | Explanation               |
+| --------- | ---------- | ------------------------- |
+| **Time**  | O(n)       | Traverses the string once |
+| **Space** | O(n)       | Creates temporary arrays  |
 
 Where `n` is the length of the string.
 
@@ -213,19 +219,23 @@ Where `n` is the length of the string.
 In the interview, notice that the interviewer wanted to evaluate:
 
 ### 1. **Problem Understanding**
+
 - Clarify requirements (what reverses? what doesn't?)
 - Ask questions (multiple spaces? tabs? accents?)
 
 ### 2. **Algorithmic Reasoning**
+
 - Break problem into smaller parts (word by word)
 - Handle details (special characters)
 
 ### 3. **Clean Implementation**
+
 - Readable code with clear names
 - Use helper functions
 - Avoid overly complex solutions
 
 ### 4. **Testing**
+
 - Think about edge cases
 - Validate your solution
 
@@ -236,6 +246,7 @@ In the interview, notice that the interviewer wanted to evaluate:
 **Tips for when you receive this type of challenge:**
 
 ### ✅ What to do
+
 - 🗣️ **Talk out loud** - Explain your reasoning
 - 🤔 **Ask questions** - "Can I assume the input is a valid string?"
 - 🧪 **Test edge cases** - Empty string, special characters, etc
@@ -243,6 +254,7 @@ In the interview, notice that the interviewer wanted to evaluate:
 - 📝 **Explain** - Show that you understand the solution
 
 ### ❌ What to avoid
+
 - 🏃 **Don't rush** - Clarity is more important than speed
 - 🤐 **Don't stay silent** - Show your thinking
 - 🔄 **Don't refactor indefinitely** - Stop when it's good
@@ -259,16 +271,17 @@ function reverseString(str) {
   return str.replace(/\S+/g, word => {
     const letters = word.match(/[a-zA-Z]/g) || [];
     let i = letters.length;
-    
+
     return word.replace(/[a-zA-Z]/g, () => letters[--i]);
   });
 }
 
-console.log(reverseString("hello-world test!"));
+console.log(reverseString('hello-world test!'));
 // "olleh-dlrow tset!"
 ```
 
 **How it works:**
+
 - `/\S+/g` - Finds all words (without spaces)
 - `match(/[a-zA-Z]/g)` - Extracts only letters
 - `replace(/[a-zA-Z]/g, ...)` - Replaces letters keeping specials in place

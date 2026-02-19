@@ -4,7 +4,7 @@ description: 'Aprenda a resolver um desafio de entrevista técnica: inverter str
 date: '2026-02-14'
 tags: ['javascript', 'algorithms', 'interviews', 'problem-solving', 'strings']
 locale: 'pt'
-coverImage: '/blog/capas/reverse-string-interview.jpg'
+coverImage: '/blog/cover/reverse-string-interview.png'
 ---
 
 # 💡 Desafio de Entrevista: Inverter Strings com Regras Específicas
@@ -27,23 +27,23 @@ Criar uma função que:
 
 ```javascript
 // Exemplo 1: Palavra simples
-reverseString("hello") 
+reverseString('hello');
 // Esperado: "olleh"
 
 // Exemplo 2: Múltiplas palavras
-reverseString("hello world")
+reverseString('hello world');
 // Esperado: "olleh dlrow"
 
 // Exemplo 3: Com caracteres especiais (não se movem!)
-reverseString("he-llo")
+reverseString('he-llo');
 // Esperado: "ol-leh"
 
 // Exemplo 4: Múltiplas palavras com caracteres especiais
-reverseString("hello-world test")
+reverseString('hello-world test');
 // Esperado: "olleh-dlrow tset"
 
 // Exemplo 5: Caracteres especiais mantêm posição
-reverseString("a-b-c")
+reverseString('a-b-c');
 // Esperado: "c-b-a"
 ```
 
@@ -62,6 +62,7 @@ Vamos entender melhor com o exemplo `"he-llo"`:
 5. Reinserir `-` na posição 2: `o`, `l`, `-`, `l`, `e`, `h` → `"ol-leh"`
 
 **Estratégia:**
+
 1. Dividir a string em palavras
 2. Para cada palavra:
    - Extrair apenas caracteres alfabéticos
@@ -78,18 +79,18 @@ Vamos entender melhor com o exemplo `"he-llo"`:
 ```javascript
 function reverseString(str) {
   return str
-    .split(' ')                           // Dividir por espaços
-    .map(word => reverseWord(word))       // Inverter cada palavra
-    .join(' ');                           // Reunir com espaços
+    .split(' ') // Dividir por espaços
+    .map(word => reverseWord(word)) // Inverter cada palavra
+    .join(' '); // Reunir com espaços
 }
 
 function reverseWord(word) {
   // Extrair apenas caracteres alfabéticos
   const letters = word.split('').filter(char => /[a-zA-Z]/.test(char));
-  
+
   // Inverter os caracteres alfabéticos
   letters.reverse();
-  
+
   // Reconstruir a palavra
   let letterIndex = 0;
   return word
@@ -104,12 +105,13 @@ function reverseWord(word) {
 }
 
 // Teste
-console.log(reverseString("hello world"));        // "olleh dlrow"
-console.log(reverseString("he-llo"));             // "ol-leh"
-console.log(reverseString("hello-world test"));   // "olleh-dlrow tset"
+console.log(reverseString('hello world')); // "olleh dlrow"
+console.log(reverseString('he-llo')); // "ol-leh"
+console.log(reverseString('hello-world test')); // "olleh-dlrow tset"
 ```
 
 **Como funciona:**
+
 1. `reverseString()` divide a string por espaços e processa cada palavra
 2. `reverseWord()` extrai letras, as inverte, e reconstrói mantendo especiais no lugar
 3. Usa regex `/[a-zA-Z]/` para identificar caracteres alfabéticos
@@ -123,9 +125,15 @@ function reverseString(str) {
   return str
     .split(' ')
     .map(word => {
-      const letters = word.split('').filter(c => /[a-zA-Z]/).reverse();
+      const letters = word
+        .split('')
+        .filter(c => /[a-zA-Z]/)
+        .reverse();
       let i = 0;
-      return word.split('').map(c => /[a-zA-Z]/.test(c) ? letters[i++] : c).join('');
+      return word
+        .split('')
+        .map(c => (/[a-zA-Z]/.test(c) ? letters[i++] : c))
+        .join('');
     })
     .join(' ');
 }
@@ -149,21 +157,19 @@ function reverseWord(word, preserveChars) {
   // Extrair apenas caracteres que NÃO são preservados
   const chars = word.split('').filter(char => !preserveChars.test(char));
   chars.reverse();
-  
+
   // Reconstruir
   let charIndex = 0;
   return word
     .split('')
-    .map(char => 
-      preserveChars.test(char) ? char : chars[charIndex++]
-    )
+    .map(char => (preserveChars.test(char) ? char : chars[charIndex++]))
     .join('');
 }
 
 // Uso
-console.log(reverseString("hello-world")); // "olleh-dlrow"
+console.log(reverseString('hello-world')); // "olleh-dlrow"
 // Customizar: apenas manter números
-console.log(reverseString("hel3lo w0rld", /[0-9]/)); // "0lrw dl3leh"
+console.log(reverseString('hel3lo w0rld', /[0-9]/)); // "0lrw dl3leh"
 ```
 
 ---
@@ -172,37 +178,37 @@ console.log(reverseString("hel3lo w0rld", /[0-9]/)); // "0lrw dl3leh"
 
 ```javascript
 // Casos básicos
-console.assert(reverseString("hello") === "olleh", "Palavra simples");
-console.assert(reverseString("hello world") === "olleh dlrow", "Múltiplas palavras");
+console.assert(reverseString('hello') === 'olleh', 'Palavra simples');
+console.assert(reverseString('hello world') === 'olleh dlrow', 'Múltiplas palavras');
 
 // Com caracteres especiais
-console.assert(reverseString("he-llo") === "ol-leh", "Hífen no meio");
-console.assert(reverseString("hello!") === "olleh!", "Pontuação no final");
-console.assert(reverseString("h-e-l-l-o") === "o-l-l-e-h", "Múltiplos hífens");
+console.assert(reverseString('he-llo') === 'ol-leh', 'Hífen no meio');
+console.assert(reverseString('hello!') === 'olleh!', 'Pontuação no final');
+console.assert(reverseString('h-e-l-l-o') === 'o-l-l-e-h', 'Múltiplos hífens');
 
 // Casos complexos
 console.assert(
-  reverseString("hello-world test!") === "olleh-dlrow tset!",
-  "Múltiplas palavras com especiais"
+  reverseString('hello-world test!') === 'olleh-dlrow tset!',
+  'Múltiplas palavras com especiais'
 );
 
 // Vazio e casos extremos
-console.assert(reverseString("") === "", "String vazia");
-console.assert(reverseString("a") === "a", "Caractere único");
-console.assert(reverseString("!!!") === "!!!", "Apenas especiais");
-console.assert(reverseString("-a-b-c-") === "-c-b-a-", "Especiais nas extremidades");
+console.assert(reverseString('') === '', 'String vazia');
+console.assert(reverseString('a') === 'a', 'Caractere único');
+console.assert(reverseString('!!!') === '!!!', 'Apenas especiais');
+console.assert(reverseString('-a-b-c-') === '-c-b-a-', 'Especiais nas extremidades');
 
-console.log("✅ Todos os testes passaram!");
+console.log('✅ Todos os testes passaram!');
 ```
 
 ---
 
 ## 📊 Análise de Complexidade
 
-| Aspecto | Complexidade | Explicação |
-|---------|--------------|-----------|
-| **Tempo** | O(n) | Percorre a string uma vez |
-| **Espaço** | O(n) | Cria arrays temporários |
+| Aspecto    | Complexidade | Explicação                |
+| ---------- | ------------ | ------------------------- |
+| **Tempo**  | O(n)         | Percorre a string uma vez |
+| **Espaço** | O(n)         | Cria arrays temporários   |
 
 Onde `n` é o comprimento da string.
 
@@ -213,19 +219,23 @@ Onde `n` é o comprimento da string.
 Na entrevista, perceba que o entrevistador queria avaliar:
 
 ### 1. **Entendimento do Problema**
+
 - Clarificar requisitos (o que inverte? o que não inverte?)
 - Fazer perguntas (espaços múltiplos? tabs? acentos?)
 
 ### 2. **Raciocínio Algorítmico**
+
 - Dividir problema em partes menores (palavra por palavra)
 - Lidar com detalhes (caracteres especiais)
 
 ### 3. **Implementação Limpa**
+
 - Código legível com nomes claros
 - Usar funções auxiliares
 - Evitar soluções super complexas
 
 ### 4. **Testes**
+
 - Pensar em edge cases
 - Validar a solução
 
@@ -236,6 +246,7 @@ Na entrevista, perceba que o entrevistador queria avaliar:
 **Dicas para quando receber esse tipo de desafio:**
 
 ### ✅ O que fazer
+
 - 🗣️ **Falar em voz alta** - Explique seu raciocínio
 - 🤔 **Pergunte** - "Posso assumir que a entrada é uma string válida?"
 - 🧪 **Teste casos extremos** - String vazia, caracteres especiais, etc
@@ -243,6 +254,7 @@ Na entrevista, perceba que o entrevistador queria avaliar:
 - 📝 **Explique** - Mostre que entendeu a solução
 
 ### ❌ O que evitar
+
 - 🏃 **Não se apresse** - Claridade é mais importante que velocidade
 - 🤐 **Não fique em silêncio** - Mostre seu pensamento
 - 🔄 **Não refatore indefinidamente** - Pare quando ficar bom
@@ -259,16 +271,17 @@ function reverseString(str) {
   return str.replace(/\S+/g, word => {
     const letters = word.match(/[a-zA-Z]/g) || [];
     let i = letters.length;
-    
+
     return word.replace(/[a-zA-Z]/g, () => letters[--i]);
   });
 }
 
-console.log(reverseString("hello-world test!"));
+console.log(reverseString('hello-world test!'));
 // "olleh-dlrow tset!"
 ```
 
 **Como funciona:**
+
 - `/\S+/g` - Encontra todas as palavras (sem espaços)
 - `match(/[a-zA-Z]/g)` - Extrai apenas letras
 - `replace(/[a-zA-Z]/g, ...)` - Substitui letras mantendo especiais
